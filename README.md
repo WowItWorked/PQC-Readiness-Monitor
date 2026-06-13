@@ -39,17 +39,35 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 ## Intelligence feeds
 
 Each intelligence section combines a curated June 2026 snapshot with a live
-running list refreshed on every page load from trusted, browser-accessible
-sources, and persisted locally across sessions:
+running list refreshed on every page load, and persisted locally across
+sessions. Sourcing is scoped per section:
 
-- **Federal Register API** — official U.S. policy and regulator documents
-- **IETF Datatracker API** — post-quantum standards and guidance documents
-- **Crossref API** — peer-reviewed PQC research
-- **Hacker News (Algolia) API** — discovery layer, restricted to a strict
-  allowlist of vendor newsrooms, sector institutions, and reputable tech press
+- **Standards & Policy** — official **U.S., U.K., and EU government only**.
+  Live: Federal Register API (U.S.) and the GOV.UK Search API (U.K. — HM
+  Treasury, DSIT, NCSC). EU policy (ENISA, European Commission) and the core
+  NIST standards are included as verified curated links.
+- **Implementation Guidance** — fulsome best practices and implementation
+  guidance from **NIST/NCCoE, CISA/NSA, UK NCSC, ENISA, FS-ISAC, and FSSCC**.
+  Each best-practice card and document links to its authoritative source; live
+  additions come from NIST notices (Federal Register) and GOV.UK guidance.
+- **Sector News** — U.S. financial regulators (Federal Register) plus an
+  allowlist of sector institutions and financial press (BIS, Swift, DTCC,
+  Reuters, FT, …) via the Hacker News API.
+- **Third-Party News** — vendor newsroom posts and reputable technology press,
+  restricted to a domain allowlist via the Hacker News API.
 
-Every feed is searchable, sortable, and links to the original source. Feeds
-degrade gracefully offline (curated snapshot + stored list still render).
+**Every item in every section links to its authoritative source.** Each feed is
+searchable and sortable (newest / oldest / source). Feeds degrade gracefully
+offline — the curated, fully-linked snapshot still renders.
+
+## Daily auto-refresh
+
+A scheduled GitHub Action ([`.github/workflows/daily-refresh.yml`](.github/workflows/daily-refresh.yml))
+runs every day at **6:00 AM US Eastern** (10:00 UTC): it advances the "Data as
+of" date, commits, and requests a fresh GitHub Pages build so the published site
+never goes stale. (Visitors also get live data on every page load.) GitHub cron
+is UTC and ignores daylight saving — edit the `cron:` line to change the time or
+timezone.
 
 ## Project layout
 

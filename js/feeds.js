@@ -65,6 +65,37 @@
     };
   }
 
+  /* ---- Source: GOV.UK Search API (official U.K. government) -----------------
+     opts: { query, tag } — relevance search; a PQC guard keeps it on-topic. */
+  function fromGovUk(opts) {
+    return function () {
+      var url = "https://www.gov.uk/api/search.json?q=" + encodeURIComponent(opts.query) +
+        "&count=15&fields=title,link,public_timestamp,organisations,description";
+      return getJson(url).then(function (j) {
+        return (j.results || [])
+          .filter(function (r) {
+            return PQC_GUARD.test(((r.title || "") + " " + (r.description || "")));
+          })
+          .slice(0, 8)
+          .map(function (r) {
+            var org = (r.organisations && r.organisations[0] && r.organisations[0].title) || "UK Government";
+            var link = String(r.link || "");
+            var abs = link.indexOf("http") === 0 ? link : "https://www.gov.uk" + link;
+            return {
+              id: "govuk:" + link,
+              d: String(r.public_timestamp || "").slice(0, 10),
+              tag: opts.tag,
+              title: clip(r.title, 200),
+              body: clip(r.description || "UK government publication — open GOV.UK for the full document.", 300),
+              src: "GOV.UK · " + org,
+              url: abs,
+              live: true,
+            };
+          });
+      });
+    };
+  }
+
   /* ---- Source: IETF Datatracker ---------------------------------------------
      opts: { filter (querystring fragment), tag } — the API rejects
      order_by=time, so filter to recent activity and sort client-side. */
@@ -193,28 +224,30 @@
 
   var SECTIONS = {
     standards: {
-      store: "pqc-standards-feed-v1",
+      // Official U.S. / U.K. / EU government only. (EU has no CORS-accessible
+      // live API — EU policy is covered by verified curated links in news.js.)
+      store: "pqc-standards-feed-v2",
       sources: [
-        { name: "Federal Register", fn: fromFederalRegister({ term: '"post-quantum cryptography"', tag: "US Policy" }) },
-        { name: "IETF Datatracker", fn: fromIetf({ filter: "title__icontains=post-quantum", tag: "IETF" }) },
-        { name: "Crossref", fn: fromCrossref({ query: "post-quantum cryptography", guards: [PQC_GUARD], tag: "Research" }) },
+        { name: "Federal Register (US)", fn: fromFederalRegister({ term: '"post-quantum cryptography"', tag: "US Gov" }) },
+        { name: "GOV.UK (UK)", fn: fromGovUk({ query: '"post-quantum"', tag: "UK Gov" }) },
       ],
     },
     guidance: {
-      store: "pqc-feed-guidance-v1",
+      // Authoritative government guidance, live. NIST via the Federal Register,
+      // UK NCSC/DSIT via GOV.UK. Best-practice cards + curated docs live in news.js.
+      store: "pqc-feed-guidance-v2",
       sources: [
-        { name: "IETF PQUIP WG", fn: fromIetf({ filter: "group__acronym=pquip&type=draft", tag: "IETF WG" }) },
         { name: "Federal Register (NIST)", fn: fromFederalRegister({ term: '"post-quantum"',
           agencies: ["national-institute-of-standards-and-technology"], tag: "NIST" }) },
+        { name: "GOV.UK guidance (UK)", fn: fromGovUk({ query: '"post-quantum" cryptography', tag: "UK Gov" }) },
       ],
     },
     sector: {
-      store: "pqc-feed-sector-v1",
+      // U.S. financial regulators (Federal Register) + allowlisted sector press.
+      store: "pqc-feed-sector-v2",
       sources: [
         { name: "Federal Register (financial regulators)", fn: fromFederalRegister({ term: '"post-quantum"',
           agencies: FIN_AGENCIES, tag: "Regulators" }) },
-        { name: "Crossref", fn: fromCrossref({ query: "post-quantum cryptography financial banking sector",
-          guards: [PQC_GUARD, FIN_GUARD], tag: "Research" }) },
         { name: "sector press (via HN)", fn: fromHackerNews({ query: '"post-quantum"', domains: FIN_DOMAINS, tag: "Press" }) },
       ],
     },

@@ -44,35 +44,38 @@
   /* ---- Section configuration -------------------------------------------------- */
   var INTEL = {
     standards: {
-      intro: "Where the standards and policy clocks stand. The dates that matter for migration planning: " +
-        "RSA and ECC deprecated after 2030, disallowed after 2035 (NIST IR 8547), with the G7 targeting " +
-        "critical financial systems by 2030–2032.",
+      intro: "Standards and policy from official U.S., U.K., and EU government bodies only. The dates that " +
+        "matter for migration planning: RSA and ECC deprecated after 2030, disallowed after 2035 (NIST IR 8547), " +
+        "with the G7 targeting critical financial systems by 2030–2032. Every item links to its authoritative source.",
       curated: function () { return window.PQC_NEWS.standards; },
-      foot: "Live items are pulled from the Federal Register API (official U.S. policy documents), the IETF " +
-        "Datatracker API (post-quantum standards work), and the Crossref API (peer-reviewed research).",
+      foot: "Sources are official government only: the Federal Register API (U.S. policy documents) and the " +
+        "GOV.UK Search API (U.K. — HM Treasury, DSIT, NCSC). EU policy (ENISA, European Commission) is included " +
+        "as verified curated links, as the EU has no browser-accessible live API.",
     },
     sector: {
-      intro: "What the financial sector is actually doing — pilots, disclosures, and the quiet commercial " +
-        "pressures (insurers, vendors, browsers) that move readiness without a mandate.",
+      intro: "What the financial sector is actually doing — pilots, disclosures, and the commercial pressures " +
+        "that move readiness without a mandate. Every item links to its source.",
       curated: function () { return window.PQC_NEWS.sector; },
-      foot: "Live items are pulled from the Federal Register API (U.S. financial regulators), the Crossref API " +
-        "(peer-reviewed research on PQC in finance), and an allowlist of sector institutions and financial " +
-        "press surfaced via the Hacker News API.",
+      foot: "Live items are pulled from the Federal Register API (U.S. financial regulators) and an allowlist of " +
+        "sector institutions and financial press (BIS, Swift, DTCC, Reuters, FT, and similar) surfaced via the " +
+        "Hacker News API. Curated items link to authoritative sector sources (BIS, DTCC, FSSCC).",
     },
     vendornews: {
       intro: "What the sector's technology suppliers are shipping — cloud and edge providers are furthest " +
         "along, the PKI/HSM vendors are the enablers, and the core-banking processors are the bottleneck " +
-        "most institutions actually depend on.",
+        "most institutions actually depend on. Every item links to its source.",
       curated: function () { return window.PQC_NEWS.vendors; },
       foot: "Live items are vendor newsroom posts and reputable technology press surfaced via the Hacker News " +
-        "API, restricted to a domain allowlist so links always go to the original trusted source.",
+        "API, restricted to a domain allowlist so links always go to the original trusted source. Curated items " +
+        "link to vendors' own post-quantum pages (AWS, Google, Cloudflare, IBM, Thales, DigiCert).",
     },
     guidance: {
-      intro: "Best practices distilled from NIST NCCoE, CISA/NSA joint guidance, FS-ISAC's PQC Working Group, " +
-        "and the G7 CEG roadmap. The steady, unglamorous work — which is rather the point.",
+      intro: "Fulsome best practices and implementation guidance from NIST/NCCoE, CISA/NSA, the UK NCSC, ENISA, " +
+        "and the financial sector (FS-ISAC, FSSCC). Each best-practice card and document links to its " +
+        "authoritative source.",
       curated: function () { return window.PQC_NEWS.guidance; },
-      foot: "Live items are pulled from the IETF PQUIP working group (post-quantum usage and operations " +
-        "guidance) and NIST notices in the Federal Register.",
+      foot: "Best-practice cards cite NIST NCCoE, CISA/NSA, NCSC, FS-ISAC, and FSSCC. The documents list combines " +
+        "verified authoritative guidance with live NIST notices (Federal Register) and U.K. guidance (GOV.UK).",
       cards: true,
     },
   };
@@ -127,22 +130,30 @@
     });
 
     if (cfg.cards) {
-      // Guidance: curated best-practice cards on top, live documents feed below.
+      // Guidance: curated best-practice cards (each linked to its authoritative
+      // source) on top, then curated authoritative documents + live feed below.
       var cards = cfg.curated().filter(function (g) {
-        return !q || (g.title + " " + g.body).toLowerCase().indexOf(q) !== -1;
+        return !q || (g.title + " " + g.body + " " + (g.src || "")).toLowerCase().indexOf(q) !== -1;
       }).map(function (g, i) {
+        var source = g.url
+          ? '<a class="guidance-src" href="' + esc(g.url) + '" target="_blank" rel="noopener">' +
+            icon("file-check", 13) + esc(g.src || "Source") + '</a>'
+          : '';
         return '<div class="guidance-card">' +
           '<div class="guidance-head"><span class="guidance-icon">' + icon(g.icon, 17) + '</span>' +
           '<span class="guidance-num">' + String(i + 1).padStart(2, "0") + '</span></div>' +
           '<h3 class="guidance-title">' + esc(g.title) + '</h3>' +
-          '<p class="guidance-body">' + esc(g.body) + '</p></div>';
+          '<p class="guidance-body">' + esc(g.body) + '</p>' + source + '</div>';
       }).join('');
-      var docs = sortItems(live.filter(function (it) { return matchesQuery(it, q); }), opts.sort);
+      var curatedDocs = (window.PQC_NEWS.guidanceDocs || []).map(function (n, i) {
+        return Object.assign({ id: "guidance-doc:" + i }, n);
+      });
+      var docs = sortItems(curatedDocs.concat(live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
       return (cards ? '<div class="guidance-grid">' + cards + '</div>'
           : emptyHtml("No practices match. Boring, in the best way.")) +
-        '<div class="intel-subhead">Latest guidance &amp; reference documents</div>' +
+        '<div class="intel-subhead">Authoritative guidance &amp; reference documents</div>' +
         (docs.length ? card({ pad: "6px 24px" }, docs.map(newsItem).join(''))
-          : emptyHtml(q ? "No live documents match." : "Nothing on the running list yet — sources are checked on every load."));
+          : emptyHtml(q ? "No documents match." : "Nothing on the running list yet — sources are checked on every load."));
     }
 
     var curated = cfg.curated().map(function (n, i) { return Object.assign({ id: section + "-curated:" + i }, n); });
@@ -160,9 +171,9 @@
       '<p class="' + (wide ? 'guidance-intro' : 'news-intro') + '">' + esc(cfg.intro) + '</p>' +
       toolbarHtml(section, opts) +
       '<div id="intel-list">' + renderIntelList(section, opts) + '</div>' +
-      '<div class="register-footnote">' + esc(cfg.foot) + ' New material accumulates in a local running list ' +
-      'across sessions, is checked on every page load, and links to the original source. ' +
-      'Entries without a link are the curated June 2026 snapshot.</div>' +
+      '<div class="register-footnote">' + esc(cfg.foot) + ' Live material accumulates in a local running list ' +
+      'across sessions and is checked on every page load; the published site is also rebuilt daily at 6am. ' +
+      'Every item links to its authoritative source.</div>' +
       '</div>';
   };
 

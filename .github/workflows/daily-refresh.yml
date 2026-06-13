@@ -1,0 +1,61 @@
+name: Daily refresh
+
+# Refreshes the published dashboard every day at 6:00 AM US Eastern.
+# GitHub cron runs in UTC and does not observe daylight saving, so 10:00 UTC
+# is 6:00 AM EDT (summer) / 5:00 AM EST (winter). Adjust the cron below for a
+# different timezone (e.g. "0 6 * * *" for 6:00 AM UTC).
+#
+# What it does each run:
+#   1. Advances the "Data as of" date shown on the page to the current date.
+#   2. Commits and pushes the change (so the published site is regenerated).
+#   3. Explicitly requests a GitHub Pages build so the live site updates even
+#      when the push is made by the Actions bot.
+# The intelligence feeds themselves are fetched live in the browser on every
+# visit from official government and allowlisted sources, so visitors always
+# see current material; this job keeps the published snapshot date honest and
+# guarantees a daily rebuild.
+
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: daily-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Update "Data as of" date to today
+        run: |
+          TODAY="$(date -u +'%B %-d, %Y')"
+          echo "Setting snapshot date to: $TODAY"
+          sed -i "s/asOf: \"[^\"]*\"/asOf: \"$TODAY\"/" js/data/news.js
+          if git diff --quiet -- js/data/news.js; then
+            echo "Date already current — no commit needed."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add js/data/news.js
+            git commit -m "Daily refresh: snapshot date $TODAY"
+            git push
+          fi
+
+      - name: Request a GitHub Pages build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages/builds" \
+            -o /dev/null -w "Pages build requested: HTTP %{http_code}\n"

@@ -177,6 +177,9 @@ td.cell-empty { padding: 44px 16px; text-align: center; font-size: 14px; color: 
   box-shadow: var(--shadow-xs); padding: 36px 16px; text-align: center;
   font-size: 14px; color: var(--fg-3); }
 .intel-subhead { font-size: 15px; font-weight: 700; color: var(--fg-1); margin: 24px 0 12px; }
+.guidance-src { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+  font-size: 12px; font-weight: 600; color: var(--fg-link); text-decoration: none; }
+.guidance-src:hover { text-decoration: underline; }
 .pill-btn:disabled { opacity: 0.55; cursor: default; }
 .chip-new { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--pnc-orange-700); background: var(--pnc-orange-050); border: 1px solid var(--pnc-orange-100);
