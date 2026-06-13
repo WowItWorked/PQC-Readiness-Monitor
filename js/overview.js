@@ -100,6 +100,7 @@
     }).join('');
 
     var inner =
+      '<div class="tl-scroll"><div class="tl-inner">' +
       '<div style="position:relative;height:' + H + 'px;margin:6px 6px 0">' +
       // projected CRQC window
       '<div style="position:absolute;top:0;height:' + (H - 24) + 'px;left:' + pos(crqcStart) + ';right:0;' +
@@ -121,6 +122,7 @@
       '<div class="tl-axis-years">' + [2024, 2026, 2028, 2030, 2032, 2034, 2036].map(function (y) {
         return '<span>' + y + '</span>';
       }).join('') + '</div>' +
+      '</div></div>' +
       '<div class="tl-footnote">Google Quantum AI research (May 2025) cut the estimated cost of breaking RSA-2048 ' +
       'twenty-fold — to under one million noisy qubits running for about a week. Expert surveys now put 10-year ' +
       'CRQC probability at 28–49%, the highest recorded. Google responded by committing to complete its own PQC ' +

@@ -81,6 +81,7 @@
       '</aside>' +
       '<div class="main-col">' +
       '<header class="topbar">' +
+      '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu">' + icon("menu", 20) + '</button>' +
       '<div class="topbar-titles"><div class="topbar-crumb" id="crumb"></div>' +
       '<div class="topbar-title" id="title"></div></div>' +
       '<span class="asof-chip">' + icon("calendar", 14, "var(--fg-3)") + 'Data as of ' + esc(window.PQC_NEWS.asOf) + '</span>' +
@@ -88,7 +89,9 @@
       '<input class="search-input" id="global-search" placeholder="Search institutions…"></div>' +
       '</header>' +
       '<main class="main-scroll" id="main"></main>' +
-      '</div></div>';
+      '</div>' +
+      '<div class="nav-backdrop" data-action="close-nav"></div>' +
+      '</div>';
   }
 
   function renderChrome() {
@@ -123,9 +126,15 @@
     main.scrollTop = 0;
   }
 
+  function setNav(open) {
+    var app = document.querySelector(".app");
+    if (app) app.classList.toggle("nav-open", open);
+  }
+
   function navigate(view) {
     state.active = view;
     state.viewoptsOpen = false;
+    setNav(false); // close the mobile menu after choosing a destination
     renderChrome();
     renderMain();
   }
@@ -151,6 +160,12 @@
     var action = el.getAttribute("data-action");
 
     switch (action) {
+      case "toggle-nav":
+        setNav(!document.querySelector(".app").classList.contains("nav-open"));
+        break;
+      case "close-nav":
+        setNav(false);
+        break;
       case "pick-status":
         state.statusFilter = el.getAttribute("data-status");
         navigate("institutions");
