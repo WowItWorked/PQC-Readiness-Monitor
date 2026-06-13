@@ -1,0 +1,168 @@
+/* ============================================================================
+   PNC DESIGN SYSTEM — Foundations
+   Colors, typography, spacing, radii, elevation.
+   "Brilliantly Boring": sturdy, legible, trustworthy. No flourish for its own sake.
+
+   Fonts are Google Fonts SUBSTITUTES for PNC's licensed brand faces — see README.
+   Load this file AND the font <link> (or @import below) on any page.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300..800;1,400..600&family=Source+Serif+4:opsz,wght@8..60,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* --- Brand core ------------------------------------------------------- */
+  --pnc-orange:        #F58025;  /* Willpower Orange — primary brand mark / accent */
+  --pnc-orange-600:    #E06E14;  /* hover */
+  --pnc-orange-700:    #C75E0B;  /* pressed */
+  --pnc-orange-100:    #FDEAD7;  /* tint / wash */
+  --pnc-orange-050:    #FEF6EE;
+
+  --pnc-blue:          #0069AA;  /* PNC Blue — links, secondary actions, info */
+  --pnc-blue-600:      #005A93;
+  --pnc-blue-700:      #004A79;
+  --pnc-blue-100:      #D7EBF5;
+  --pnc-blue-050:      #EFF7FB;
+
+  --pnc-navy:          #10314F;  /* Deep navy — headers, trust surfaces, primary chrome */
+  --pnc-navy-700:      #0B2438;
+  --pnc-navy-900:      #07182A;
+
+  /* --- Neutrals (warm-cool balanced gray ramp) -------------------------- */
+  --gray-000:          #FFFFFF;
+  --gray-025:          #FAFAFA;
+  --gray-050:          #F4F5F6;
+  --gray-100:          #E9EBED;
+  --gray-200:          #D7DBDF;
+  --gray-300:          #BCC2C8;
+  --gray-400:          #97A0A8;
+  --gray-500:          #6B747C;
+  --gray-600:          #4D555C;
+  --gray-700:          #353B41;
+  --gray-800:          #23282C;
+  --gray-900:          #14171A;
+
+  /* --- Semantic: foreground / background / line ------------------------- */
+  --fg-1:    var(--gray-900);   /* primary text */
+  --fg-2:    var(--gray-600);   /* secondary text */
+  --fg-3:    var(--gray-500);   /* tertiary / captions */
+  --fg-onbrand: #FFFFFF;        /* text on navy / orange / blue */
+  --fg-link: var(--pnc-blue);
+
+  --bg-1:    #FFFFFF;           /* base surface */
+  --bg-2:    var(--gray-050);   /* app canvas / subtle fill */
+  --bg-3:    var(--gray-100);   /* sunken / hover fill */
+  --bg-brand: var(--pnc-navy);  /* chrome / headers */
+
+  --line-1:  var(--gray-200);   /* default border / divider */
+  --line-2:  var(--gray-300);   /* stronger border */
+  --line-focus: var(--pnc-blue);
+
+  /* --- Semantic: status (banking-grade, muted not neon) ----------------- */
+  --success:      #1B7F4B;  --success-bg: #E7F4EC;  --success-line: #BFE0CC;
+  --warning:      #B5740A;  --warning-bg: #FBF1DD;  --warning-line: #ECD3A0;
+  --danger:       #C0392B;  --danger-bg:  #FBEAE8;  --danger-line:  #EFC4BF;
+  --info:         #0069AA;  --info-bg:    #EFF7FB;  --info-line:    #C5E2F0;
+
+  /* --- Risk severity scale (Technology Risk domain) --------------------- */
+  --risk-critical: #8E1B12;  --risk-critical-bg: #F7E4E2;
+  --risk-high:     #C0392B;  --risk-high-bg:     #FBEAE8;
+  --risk-medium:   #B5740A;  --risk-medium-bg:   #FBF1DD;
+  --risk-low:      #1B7F4B;  --risk-low-bg:      #E7F4EC;
+  --risk-info:     #6B747C;  --risk-info-bg:     #F4F5F6;
+
+  /* --- Typography families --------------------------------------------- */
+  --font-sans:  "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono:  "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* --- Type scale (1.250 major-third on display, tighter on UI) --------- */
+  --text-xs:   12px;  --lh-xs:   16px;
+  --text-sm:   14px;  --lh-sm:   20px;
+  --text-base: 16px;  --lh-base: 24px;
+  --text-md:   18px;  --lh-md:   28px;
+  --text-lg:   22px;  --lh-lg:   30px;
+  --text-xl:   28px;  --lh-xl:   36px;
+  --text-2xl:  36px;  --lh-2xl:  44px;
+  --text-3xl:  48px;  --lh-3xl:  56px;
+  --text-4xl:  64px;  --lh-4xl:  68px;
+
+  --fw-light: 300;  --fw-regular: 400;  --fw-medium: 500;
+  --fw-semibold: 600;  --fw-bold: 700;
+
+  /* --- Spacing (4px base) ---------------------------------------------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;  --sp-4: 16px;  --sp-5: 20px;
+  --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px; --sp-16: 64px;
+  --sp-20: 80px; --sp-24: 96px;
+
+  /* --- Radii (restrained — boring is square-ish) ----------------------- */
+  --radius-xs: 2px;  --radius-sm: 4px;  --radius-md: 6px;
+  --radius-lg: 10px; --radius-xl: 16px; --radius-pill: 999px;
+
+  /* --- Elevation (low, soft, cool-gray — never colored) ---------------- */
+  --shadow-xs: 0 1px 2px rgba(16, 49, 79, 0.06);
+  --shadow-sm: 0 1px 3px rgba(16, 49, 79, 0.08), 0 1px 2px rgba(16, 49, 79, 0.06);
+  --shadow-md: 0 4px 10px rgba(16, 49, 79, 0.08), 0 2px 4px rgba(16, 49, 79, 0.06);
+  --shadow-lg: 0 12px 28px rgba(16, 49, 79, 0.12), 0 4px 8px rgba(16, 49, 79, 0.06);
+  --ring-focus: 0 0 0 3px rgba(0, 105, 170, 0.35);
+
+  /* --- Motion (quick, no bounce — composed and steady) ----------------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast: 120ms;  --dur-base: 180ms;  --dur-slow: 260ms;
+}
+
+/* ============================================================================
+   SEMANTIC ELEMENT DEFAULTS — opt-in via .pnc-type scope to avoid clobbering
+   host pages. Apply class="pnc-type" on a wrapper to inherit these.
+   ========================================================================== */
+.pnc-type {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--lh-base);
+  color: var(--fg-1);
+  font-weight: var(--fw-regular);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.pnc-type h1, .pnc-h1 {
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl); line-height: var(--lh-3xl);
+  font-weight: var(--fw-bold); letter-spacing: -0.01em; color: var(--fg-1);
+  margin: 0;
+}
+.pnc-type h2, .pnc-h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl); line-height: var(--lh-2xl);
+  font-weight: var(--fw-semibold); letter-spacing: -0.005em; margin: 0;
+}
+.pnc-type h3, .pnc-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl); line-height: var(--lh-xl);
+  font-weight: var(--fw-bold); margin: 0;
+}
+.pnc-type h4, .pnc-h4 {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg); line-height: var(--lh-lg);
+  font-weight: var(--fw-semibold); margin: 0;
+}
+.pnc-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs); line-height: var(--lh-xs);
+  font-weight: var(--fw-bold); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--pnc-orange);
+}
+.pnc-type p, .pnc-body {
+  font-size: var(--text-base); line-height: var(--lh-base);
+  color: var(--fg-2); margin: 0; text-wrap: pretty;
+}
+.pnc-lead {
+  font-size: var(--text-md); line-height: var(--lh-md); color: var(--fg-2);
+}
+.pnc-small, .pnc-caption {
+  font-size: var(--text-sm); line-height: var(--lh-sm); color: var(--fg-3);
+}
+.pnc-data, .pnc-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+}

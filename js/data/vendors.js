@@ -1,0 +1,232 @@
+/* PQC Readiness Monitor — third-party provider dataset.
+   Top 100 third parties to the U.S. financial sector, ordered by approximate annual
+   revenue (company-wide unless a segment is the relevant unit). Readiness here means
+   PQC support in the products and services banks consume:
+     pqc — "shipping" (PQC available in products) | "roadmap" (public migration plan)
+         | "research" (papers/pilots only) | "none" (no public activity)
+   conf: "Documented" | "Inferred" | "Estimated" — same semantics as the institutions register. */
+
+window.VENDORS = [
+  // ---- Cloud & enterprise platforms ----
+  { name: "Microsoft", domain: "microsoft.com", hq: "Redmond, WA", rev: 280, type: "Cloud / infrastructure",
+    status: "Advanced", score: 84, conf: "Documented", pqc: "shipping",
+    foot: "Azure, M365, Entra ID, and Windows underpin most U.S. bank office and identity estates",
+    note: "ML-KEM and ML-DSA shipped in SymCrypt (the crypto library behind Windows and Azure); hybrid TLS rolling out across Windows and Azure services; a named Quantum Safe Program commits full migration by 2033.",
+    news: [
+      { d: "2025-08", t: "Quantum Safe Program announced: PQC across Microsoft stack by 2033", s: "Microsoft Security" },
+      { d: "2025-01", t: "SymCrypt adds ML-KEM and ML-DSA; Windows Insider TLS hybrid preview", s: "Microsoft" } ] },
+  { name: "Amazon Web Services", domain: "aws.amazon.com", hq: "Seattle, WA", rev: 115, type: "Cloud / infrastructure",
+    status: "Advanced", score: 85, conf: "Documented", pqc: "shipping",
+    foot: "Hosts cores, channels, and data platforms for cloud-forward banks (Capital One, fintechs, BaaS)",
+    note: "Hybrid ML-KEM key exchange enabled across KMS, ACM, Secrets Manager, CloudFront, and ALB endpoints; s2n TLS library carries PQC by default; published migration plan covers signatures next.",
+    news: [
+      { d: "2025-06", t: "ML-KEM hybrid TLS reaches CloudFront and ALB by default", s: "AWS Security Blog" },
+      { d: "2024-12", t: "AWS publishes its post-quantum migration plan", s: "AWS" } ] },
+  { name: "Google / Google Cloud", domain: "cloud.google.com", hq: "Mountain View, CA", rev: 55, type: "Cloud / infrastructure",
+    status: "Advanced", score: 88, conf: "Documented", pqc: "shipping",
+    foot: "Chrome handshakes, Google Cloud hosting, and Android devices touch every bank's customers",
+    note: "Set a 2029 internal deadline to complete PQC migration — ahead of the U.S. federal 2035 benchmark — after its researchers showed ~1M noisy qubits could break RSA-2048 in under a week. Chrome negotiates hybrid ML-KEM by default; Android 17 ships ML-DSA in verified boot; internal ALTS traffic has been PQC-protected since 2022.",
+    news: [
+      { d: "2026-03", t: "Google sets 2029 deadline to complete its own PQC migration", s: "Google Security" },
+      { d: "2025-05", t: "Gidney/Schmieg: RSA-2048 breakable with <1M noisy qubits in under a week", s: "Google Quantum AI" },
+      { d: "2025-11", t: "Android 17 ships ML-DSA in Verified Boot, Keystore, and attestation", s: "Google" } ] },
+  { name: "IBM", domain: "ibm.com", hq: "Armonk, NY", rev: 63, type: "Cloud / infrastructure",
+    status: "Advanced", score: 84, conf: "Documented", pqc: "shipping",
+    foot: "Mainframes run core processing at most large U.S. banks; also a top quantum-hardware builder",
+    note: "Co-authored the lattice algorithms NIST standardized. z16/z17 mainframes are marketed as quantum-safe (PQC-protected boot and APIs) — directly relevant to bank cores. IBM Quantum Safe portfolio (Explorer, Remediator) does cryptographic discovery for large institutions.",
+    news: [
+      { d: "2025-04", t: "z17 extends quantum-safe cryptography across the mainframe stack", s: "IBM" },
+      { d: "2024-09", t: "IBM Quantum Safe tooling adopted by global banks for crypto discovery", s: "IBM" } ] },
+  { name: "Oracle", domain: "oracle.com", hq: "Austin, TX", rev: 57, type: "Cloud / infrastructure",
+    status: "In progress", score: 55, conf: "Inferred", pqc: "roadmap",
+    foot: "Databases under bank ledgers everywhere; FLEXCUBE core in international units",
+    note: "PQC support arriving via Java (ML-KEM/ML-DSA in JDK 24+), GoldenGate, and OCI TLS; database-level guidance still maturing." },
+  { name: "Broadcom (VMware)", domain: "broadcom.com", hq: "Palo Alto, CA", rev: 60, type: "Cloud / infrastructure",
+    status: "Early stage", score: 34, conf: "Estimated", pqc: "research", foot: "Virtualization layer under most on-prem bank data centers" },
+  { name: "Salesforce", domain: "salesforce.com", hq: "San Francisco, CA", rev: 40, type: "Cloud / infrastructure",
+    status: "In progress", score: 46, conf: "Estimated", pqc: "research", foot: "CRM of record for wealth, retail, and commercial banking teams" },
+  { name: "SAP", domain: "sap.com", hq: "Walldorf, DE / Newtown Square, PA", rev: 40, type: "Cloud / infrastructure",
+    status: "In progress", score: 48, conf: "Inferred", pqc: "roadmap", note: "SAP Fioneer serves banking; group publishes crypto-agility guidance aligned to EU PQC roadmap timelines." },
+  { name: "ServiceNow", domain: "servicenow.com", hq: "Santa Clara, CA", rev: 13, type: "Cloud / infrastructure",
+    status: "In progress", score: 45, conf: "Estimated", pqc: "roadmap", foot: "ITSM/workflow platform in most large bank technology organizations" },
+  { name: "Workday", domain: "workday.com", hq: "Pleasanton, CA", rev: 9, type: "Cloud / infrastructure", status: "Early stage", score: 36, conf: "Estimated", pqc: "research" },
+  { name: "Snowflake", domain: "snowflake.com", hq: "Bozeman, MT", rev: 4, type: "Cloud / infrastructure",
+    status: "In progress", score: 45, conf: "Estimated", pqc: "roadmap", foot: "Data warehouse for bank analytics; post-2024-incident security hardening accelerated crypto modernization" },
+  { name: "Databricks", domain: "databricks.com", hq: "San Francisco, CA", rev: 3.5, type: "Cloud / infrastructure", status: "Early stage", score: 36, conf: "Estimated", pqc: "research" },
+
+  // ---- Core banking processors ----
+  { name: "Fiserv", domain: "fiserv.com", hq: "Milwaukee, WI", rev: 21, type: "Core banking",
+    status: "Early stage", score: 30, conf: "Inferred", pqc: "research",
+    foot: "Core processor and digital-banking provider to roughly one in three U.S. banks; owns Zelle rails via co-ownership and Clover/First Data acquiring",
+    note: "No public PQC roadmap as of this snapshot — the single most consequential gap in U.S. financial-sector PQC readiness given how many institutions inherit Fiserv's cryptography. FS-ISAC participant; modernization (Finxact cloud core) shortens the eventual path.",
+    news: [ { d: "2026-02", t: "Analysts flag core processors as the sector's PQC bottleneck", s: "Industry analysis" } ] },
+  { name: "FIS", domain: "fisglobal.com", hq: "Jacksonville, FL", rev: 10.5, type: "Core banking",
+    status: "Early stage", score: 32, conf: "Inferred", pqc: "research",
+    foot: "Core, payments, and capital-markets technology across thousands of U.S. institutions",
+    note: "Has discussed quantum risk in thought-leadership content and participates in sector bodies; no published product PQC timeline. Modern Banking Platform (cloud core) is the likely first PQC carrier." },
+  { name: "Jack Henry", domain: "jackhenry.com", hq: "Monett, MO", rev: 2.4, type: "Core banking",
+    status: "Early stage", score: 28, conf: "Inferred", pqc: "research",
+    foot: "Core provider to ~7,500 community banks and credit unions — the long tail of the sector",
+    note: "Public-cloud technology modernization (with Google Cloud) is underway; PQC support will effectively set the migration timeline for most small U.S. institutions." },
+  { name: "Finastra", domain: "finastra.com", hq: "London, UK", rev: 1.9, type: "Core banking", status: "Early stage", score: 26, conf: "Estimated", pqc: "research", foot: "Loan IQ, payments, and treasury software widely embedded in U.S. banks" },
+  { name: "Temenos", domain: "temenos.com", hq: "Geneva, CH", rev: 1.1, type: "Core banking", status: "Early stage", score: 30, conf: "Estimated", pqc: "research", foot: "Core platform for international and some U.S. banks (incl. post-conversion Zions)" },
+  { name: "CSI (Computer Services, Inc.)", domain: "csiweb.com", hq: "Paducah, KY", rev: 0.35, type: "Core banking", status: "Not evident", score: 16, conf: "Estimated", pqc: "none", foot: "Core processor for community banks" },
+  { name: "COCC", domain: "cocc.com", hq: "Southington, CT", rev: 0.12, type: "Core banking", status: "Not evident", score: 14, conf: "Estimated", pqc: "none", foot: "Cooperative core processor for Northeast community institutions" },
+  { name: "Thought Machine", domain: "thoughtmachine.net", hq: "London, UK", rev: 0.16, type: "Core banking",
+    status: "Early stage", score: 35, conf: "Estimated", pqc: "research", foot: "Cloud-native Vault core (Arvest, JPMorgan Chase retail pilots)", note: "Kubernetes-native architecture makes crypto-agility structurally easier than legacy cores." },
+
+  // ---- Digital banking platforms ----
+  { name: "Q2", domain: "q2.com", hq: "Austin, TX", rev: 0.75, type: "Digital banking", status: "Early stage", score: 28, conf: "Estimated", pqc: "research", foot: "Digital banking front end for hundreds of regional banks" },
+  { name: "Candescent (ex-NCR Voyix)", domain: "candescent.com", hq: "Atlanta, GA", rev: 0.9, type: "Digital banking", status: "Early stage", score: 24, conf: "Estimated", pqc: "none", foot: "Digital-first banking platform spun out of NCR Voyix in 2024" },
+  { name: "Alkami", domain: "alkami.com", hq: "Plano, TX", rev: 0.4, type: "Digital banking", status: "Early stage", score: 26, conf: "Estimated", pqc: "none", foot: "Cloud digital banking for banks and credit unions" },
+  { name: "nCino", domain: "ncino.com", hq: "Wilmington, NC", rev: 0.6, type: "Digital banking", status: "Early stage", score: 30, conf: "Estimated", pqc: "research", foot: "Cloud loan origination (built on Salesforce/AWS) — inherits platform PQC posture" },
+  { name: "Backbase", domain: "backbase.com", hq: "Amsterdam, NL", rev: 0.3, type: "Digital banking", status: "Early stage", score: 26, conf: "Estimated", pqc: "none" },
+  { name: "MeridianLink", domain: "meridianlink.com", hq: "Costa Mesa, CA", rev: 0.33, type: "Digital banking", status: "Not evident", score: 18, conf: "Estimated", pqc: "none", foot: "Consumer lending and account-opening software" },
+  { name: "Blend", domain: "blend.com", hq: "San Francisco, CA", rev: 0.17, type: "Digital banking", status: "Early stage", score: 25, conf: "Estimated", pqc: "none", foot: "Mortgage and deposit-account origination for large banks" },
+
+  // ---- Payments & card networks ----
+  { name: "Visa", domain: "visa.com", hq: "San Francisco, CA", rev: 38, type: "Payments & networks",
+    status: "In progress", score: 60, conf: "Documented", pqc: "roadmap",
+    foot: "Card network touching nearly every U.S. consumer account",
+    note: "Publishes quantum-readiness research, participates in EMVCo's PQC work for payment cryptography, and acquired Featurespace (crypto-adjacent risk tooling). Network HSM migration is the long pole.",
+    news: [ { d: "2025-10", t: "EMVCo workstream on quantum-resistant payment cryptography advances", s: "EMVCo / industry" } ] },
+  { name: "Mastercard", domain: "mastercard.com", hq: "Purchase, NY", rev: 30, type: "Payments & networks",
+    status: "In progress", score: 62, conf: "Documented", pqc: "roadmap",
+    foot: "Card network + Finicity open banking + Vocalink ACH infrastructure",
+    note: "Among the most publicly engaged networks: quantum-security white papers, NIST NCCoE participation, and stated crypto-agility programs across network HSMs and EMV keys.",
+    news: [ { d: "2025-07", t: "Mastercard details crypto-agility approach for payment networks", s: "Mastercard" } ] },
+  { name: "PayPal", domain: "paypal.com", hq: "San Jose, CA", rev: 33, type: "Payments & networks", status: "In progress", score: 50, conf: "Inferred", pqc: "research", note: "Security research group has published on PQC for payment protocols." },
+  { name: "Stripe", domain: "stripe.com", hq: "South San Francisco, CA", rev: 20, type: "Payments & networks", status: "In progress", score: 48, conf: "Inferred", pqc: "research", foot: "Payments API for platforms and increasingly for bank BaaS programs" },
+  { name: "Global Payments", domain: "globalpayments.com", hq: "Atlanta, GA", rev: 10, type: "Payments & networks", status: "Early stage", score: 32, conf: "Estimated", pqc: "none", foot: "Merchant acquiring + issuer processing (TSYS) for major card programs" },
+  { name: "Adyen", domain: "adyen.com", hq: "Amsterdam, NL", rev: 2.5, type: "Payments & networks", status: "In progress", score: 46, conf: "Estimated", pqc: "research", note: "Single-platform architecture and EU regulatory pressure (DORA) accelerate crypto-agility." },
+  { name: "ACI Worldwide", domain: "aciworldwide.com", hq: "Elkhorn, NE", rev: 1.7, type: "Payments & networks", status: "Early stage", score: 30, conf: "Estimated", pqc: "research", foot: "Real-time payments software inside many bank payment hubs" },
+  { name: "The Clearing House", domain: "theclearinghouse.org", hq: "New York, NY", rev: 1.2, type: "Payments & networks",
+    status: "In progress", score: 45, conf: "Inferred", pqc: "research", foot: "Operates CHIPS, EPN (ACH), and the RTP network — systemically critical rails",
+    note: "Bank-owned utility; modern RTP stack and sector coordination role make it a likely early mover on rail cryptography." },
+  { name: "Early Warning (Zelle)", domain: "earlywarning.com", hq: "Scottsdale, AZ", rev: 0.6, type: "Payments & networks", status: "Early stage", score: 35, conf: "Estimated", pqc: "research", foot: "Bank-owned operator of Zelle P2P network and identity services" },
+  { name: "Swift", domain: "swift.com", hq: "La Hulpe, BE", rev: 1.5, type: "Payments & networks",
+    status: "In progress", score: 64, conf: "Documented", pqc: "roadmap",
+    foot: "Cross-border messaging for virtually all internationally active U.S. banks",
+    note: "Co-ran BIS Project Leap Phase 2, testing PQC signatures for liquidity transfers in an operational payment system; publishes quantum-readiness guidance to members via its Customer Security Programme.",
+    news: [ { d: "2025-12", t: "Project Leap Phase 2: PQC signatures succeed in Target2 transfers", s: "BIS / Swift" } ] },
+  { name: "Marqeta", domain: "marqeta.com", hq: "Oakland, CA", rev: 0.8, type: "Payments & networks", status: "Early stage", score: 28, conf: "Estimated", pqc: "none", foot: "Modern card issuing for fintech and bank programs" },
+  { name: "Nacha", domain: "nacha.org", hq: "Reston, VA", rev: 0.08, type: "Payments & networks", status: "Early stage", score: 30, conf: "Estimated", pqc: "research", foot: "ACH rule-setter — its security requirements propagate to every U.S. depository institution" },
+
+  // ---- Market infrastructure ----
+  { name: "Intercontinental Exchange (ICE)", domain: "ice.com", hq: "Atlanta, GA", rev: 10, type: "Market infrastructure", status: "In progress", score: 42, conf: "Estimated", pqc: "research", foot: "NYSE, fixed-income data, and ICE Mortgage Technology (Encompass/Black Knight)" },
+  { name: "Broadridge", domain: "broadridge.com", hq: "Lake Success, NY", rev: 7, type: "Market infrastructure", status: "In progress", score: 45, conf: "Inferred", pqc: "research", foot: "Proxy, post-trade, and wealth tech across nearly all U.S. broker-dealers", note: "Has run quantum-computing pilots in post-trade optimization; security modernization follows." },
+  { name: "CME Group", domain: "cmegroup.com", hq: "Chicago, IL", rev: 6.3, type: "Market infrastructure", status: "In progress", score: 42, conf: "Estimated", pqc: "research", foot: "Dominant U.S. derivatives clearing — long-horizon position data" },
+  { name: "SS&C Technologies", domain: "ssctech.com", hq: "Windsor, CT", rev: 6.2, type: "Market infrastructure", status: "Early stage", score: 28, conf: "Estimated", pqc: "none", foot: "Fund administration and advisory tech (Black Diamond, Advent)" },
+  { name: "Nasdaq", domain: "nasdaq.com", hq: "New York, NY", rev: 4.9, type: "Market infrastructure",
+    status: "In progress", score: 50, conf: "Inferred", pqc: "research", foot: "Exchange + market tech sold to 130 other marketplaces + Verafin/AxiomSL risk stack",
+    note: "Runs market-technology R&D on next-gen cryptography; its tech-vendor role multiplies the impact of its choices." },
+  { name: "Cboe Global Markets", domain: "cboe.com", hq: "Chicago, IL", rev: 4.2, type: "Market infrastructure", status: "Early stage", score: 38, conf: "Estimated", pqc: "research" },
+  { name: "DTCC", domain: "dtcc.com", hq: "New York, NY", rev: 2.6, type: "Market infrastructure",
+    status: "In progress", score: 55, conf: "Documented", pqc: "roadmap",
+    foot: "Clears and settles the vast majority of U.S. securities transactions",
+    note: "Published quantum-risk white papers urging coordinated sector migration and runs an internal crypto-agility program — among the most vocal U.S. market utilities on PQC.",
+    news: [ { d: "2025-03", t: "DTCC paper calls for coordinated post-quantum migration across market utilities", s: "DTCC" } ] },
+  { name: "LSEG (Refinitiv)", domain: "lseg.com", hq: "London, UK", rev: 12.5, type: "Market infrastructure", status: "In progress", score: 44, conf: "Estimated", pqc: "research", foot: "Market data terminals and feeds across U.S. trading desks" },
+
+  // ---- Data, credit & analytics ----
+  { name: "S&P Global", domain: "spglobal.com", hq: "New York, NY", rev: 15, type: "Data & analytics", status: "In progress", score: 42, conf: "Estimated", pqc: "research" },
+  { name: "Bloomberg", domain: "bloomberg.com", hq: "New York, NY", rev: 14, type: "Data & analytics", status: "In progress", score: 48, conf: "Inferred", pqc: "research", foot: "Terminal + B-PIPE feeds; BSSO identity used across trading floors", note: "Engineering blog has covered PQC experimentation for feed encryption." },
+  { name: "Experian", domain: "experian.com", hq: "Costa Mesa, CA", rev: 8, type: "Data & analytics", status: "Early stage", score: 36, conf: "Estimated", pqc: "research", foot: "Credit bureau — decades-long consumer data confidentiality horizon (high HNDL exposure)" },
+  { name: "Moody's", domain: "moodys.com", hq: "New York, NY", rev: 7.5, type: "Data & analytics", status: "Early stage", score: 40, conf: "Estimated", pqc: "research" },
+  { name: "Equifax", domain: "equifax.com", hq: "Atlanta, GA", rev: 6, type: "Data & analytics", status: "Early stage", score: 38, conf: "Inferred", pqc: "research", note: "Post-2017-breach, billion-dollar security rebuild produced an unusually modern crypto estate for a bureau." },
+  { name: "TransUnion", domain: "transunion.com", hq: "Chicago, IL", rev: 4.4, type: "Data & analytics", status: "Early stage", score: 34, conf: "Estimated", pqc: "none" },
+  { name: "FICO", domain: "fico.com", hq: "Bozeman, MT", rev: 2, type: "Data & analytics", status: "Early stage", score: 30, conf: "Estimated", pqc: "none", foot: "Score + Falcon fraud platform embedded in card issuing everywhere" },
+  { name: "FactSet", domain: "factset.com", hq: "Norwalk, CT", rev: 2.4, type: "Data & analytics", status: "Early stage", score: 32, conf: "Estimated", pqc: "none" },
+  { name: "Plaid", domain: "plaid.com", hq: "San Francisco, CA", rev: 1, type: "Data & analytics", status: "In progress", score: 45, conf: "Estimated", pqc: "research", foot: "Open-banking aggregation — bank-credential and account data in transit at scale" },
+
+  // ---- Security & identity ----
+  { name: "Palo Alto Networks", domain: "paloaltonetworks.com", hq: "Santa Clara, CA", rev: 9.5, type: "Security & identity",
+    status: "In progress", score: 60, conf: "Documented", pqc: "shipping", note: "PAN-OS ships quantum-resistant VPN options (hybrid key exchange for IKEv2/IPsec) and publishes PQC migration guidance for enterprise customers." },
+  { name: "Fortinet", domain: "fortinet.com", hq: "Sunnyvale, CA", rev: 6.5, type: "Security & identity",
+    status: "In progress", score: 62, conf: "Documented", pqc: "shipping", note: "FortiOS supports ML-KEM hybrid key exchange for IPsec/TLS — quantum-safe branch connectivity relevant to bank WANs." },
+  { name: "CrowdStrike", domain: "crowdstrike.com", hq: "Austin, TX", rev: 4.5, type: "Security & identity", status: "In progress", score: 48, conf: "Estimated", pqc: "research" },
+  { name: "Zscaler", domain: "zscaler.com", hq: "San Jose, CA", rev: 2.9, type: "Security & identity", status: "In progress", score: 55, conf: "Inferred", pqc: "roadmap", note: "Announced PQC support across its zero-trust exchange — bank traffic transiting Zscaler inherits it." },
+  { name: "Okta", domain: "okta.com", hq: "San Francisco, CA", rev: 2.8, type: "Security & identity", status: "In progress", score: 45, conf: "Estimated", pqc: "research", foot: "Workforce and customer identity for many banks and fintechs" },
+  { name: "Check Point", domain: "checkpoint.com", hq: "Tel Aviv, IL", rev: 2.7, type: "Security & identity", status: "In progress", score: 50, conf: "Inferred", pqc: "shipping", note: "Quantum-resistant VPN tunnels available in recent gateway releases." },
+  { name: "CyberArk (incl. Venafi)", domain: "cyberark.com", hq: "Newton, MA", rev: 1.2, type: "Security & identity",
+    status: "In progress", score: 58, conf: "Documented", pqc: "shipping",
+    note: "Venafi machine-identity platform ships PQC-readiness tooling (certificate discovery, ML-DSA test CAs) — directly useful for bank crypto inventories." },
+  { name: "SailPoint", domain: "sailpoint.com", hq: "Austin, TX", rev: 0.9, type: "Security & identity", status: "Early stage", score: 35, conf: "Estimated", pqc: "none" },
+
+  // ---- Crypto, HSM, PKI & PQC specialists ----
+  { name: "Thales", domain: "thalesgroup.com", hq: "Paris, FR", rev: 23, type: "Crypto / HSM / PKI",
+    status: "Advanced", score: 85, conf: "Documented", pqc: "shipping",
+    foot: "Luna HSMs and payShield payment HSMs sit under most U.S. bank key ceremonies and card issuance",
+    note: "Luna HSMs ship FIPS 203/204/205 support; payShield quantum-safe roadmap published; runs PQC starter kits and the 'Quantum-Safe Financial Enterprise' blueprint for banks.",
+    news: [ { d: "2026-06", t: "Thales blueprint urges banks to make 2026 the year of PQC action", s: "Thales" } ] },
+  { name: "Entrust", domain: "entrust.com", hq: "Minneapolis, MN", rev: 1.1, type: "Crypto / HSM / PKI",
+    status: "Advanced", score: 82, conf: "Documented", pqc: "shipping",
+    note: "nShield HSMs support NIST PQC algorithms; offers post-quantum test CAs and crypto-agility consulting; co-chairs PQC work in standards bodies. Card-issuance business ties it to bank operations." },
+  { name: "DigiCert", domain: "digicert.com", hq: "Lehi, UT", rev: 0.7, type: "Crypto / HSM / PKI",
+    status: "Advanced", score: 80, conf: "Documented", pqc: "shipping",
+    note: "Issues ML-DSA test certificates, ships PQC in Trust Lifecycle Manager, and runs the annual 'World Quantum Readiness Day'. CA/B Forum's 47-day certificate lifetimes force the automation banks need for PQC anyway." },
+  { name: "Keyfactor", domain: "keyfactor.com", hq: "Independence, OH", rev: 0.17, type: "Crypto / HSM / PKI",
+    status: "Advanced", score: 76, conf: "Documented", pqc: "shipping", note: "EJBCA supports PQC issuance; Bouncy Castle libraries (which Keyfactor maintains) carry ML-KEM/ML-DSA into thousands of Java estates — including bank middleware." },
+  { name: "Utimaco", domain: "utimaco.com", hq: "Aachen, DE", rev: 0.12, type: "Crypto / HSM / PKI", status: "Advanced", score: 78, conf: "Documented", pqc: "shipping", note: "General-purpose and payment HSMs with PQC firmware (Q-safe)." },
+  { name: "Futurex", domain: "futurex.com", hq: "Bulverde, TX", rev: 0.06, type: "Crypto / HSM / PKI", status: "Advanced", score: 75, conf: "Documented", pqc: "shipping", note: "Payment HSMs with PQC support; strong in U.S. card issuance and acquiring." },
+  { name: "PQShield", domain: "pqshield.com", hq: "Oxford, UK", rev: 0.03, type: "Crypto / HSM / PKI", status: "Advanced", score: 88, conf: "Documented", pqc: "shipping", note: "Pure-play PQC: silicon IP and software implementations of the NIST standards, licensed into HSMs and secure elements." },
+  { name: "SandboxAQ", domain: "sandboxaq.com", hq: "Palo Alto, CA", rev: 0.12, type: "Crypto / HSM / PKI",
+    status: "Advanced", score: 86, conf: "Documented", pqc: "shipping",
+    note: "AQtive Guard cryptographic-discovery platform is deployed at large banks for crypto inventory — the discovery step every migration starts with.",
+    news: [ { d: "2025-09", t: "Large banks adopt AQtive Guard for cryptographic asset discovery", s: "SandboxAQ" } ] },
+
+  // ---- Edge, CDN & network ----
+  { name: "Cisco", domain: "cisco.com", hq: "San Jose, CA", rev: 56, type: "Edge / CDN / network",
+    status: "In progress", score: 58, conf: "Documented", pqc: "shipping", foot: "Routing/switching/firewall estate inside virtually every bank network",
+    note: "Ships quantum-resistant key exchange in IOS-XE/IKEv2 and Duo; co-authors IETF PQC drafts; Splunk telemetry side benefits bank SOCs." },
+  { name: "Akamai", domain: "akamai.com", hq: "Cambridge, MA", rev: 4.1, type: "Edge / CDN / network",
+    status: "Advanced", score: 78, conf: "Documented", pqc: "shipping",
+    foot: "Default CDN/WAF in front of most large U.S. bank websites",
+    note: "Hybrid ML-KEM key exchange (X25519MLKEM768) generally available across its edge — most big-bank 'hybrid-capable' TLS status in this monitor flows directly from Akamai enablement.",
+    news: [ { d: "2025-08", t: "PQC key exchange GA across Akamai edge for TLS and QUIC", s: "Akamai" } ] },
+  { name: "Cloudflare", domain: "cloudflare.com", hq: "San Francisco, CA", rev: 2.1, type: "Edge / CDN / network",
+    status: "Advanced", score: 90, conf: "Documented", pqc: "shipping",
+    foot: "Fronts a growing share of fintech and regional-bank properties",
+    note: "Longest-running production PQC deployment on the internet: hybrid key exchange on by default since 2023, PQC for internal traffic, public dashboards of adoption telemetry, and a 2029 full-migration commitment.",
+    news: [ { d: "2026-01", t: "Cloudflare radar shows >50% of human TLS traffic now quantum-safe on its network", s: "Cloudflare" } ] },
+  { name: "F5", domain: "f5.com", hq: "Seattle, WA", rev: 3, type: "Edge / CDN / network", status: "In progress", score: 48, conf: "Inferred", pqc: "roadmap", foot: "BIG-IP load balancers terminate TLS inside most bank data centers", note: "PQC cipher support arriving in BIG-IP TMOS releases — on-prem TLS termination is where many banks' hybrid gap lives." },
+  { name: "Fastly", domain: "fastly.com", hq: "San Francisco, CA", rev: 0.6, type: "Edge / CDN / network", status: "In progress", score: 60, conf: "Documented", pqc: "shipping", note: "Hybrid key exchange supported at the edge." },
+
+  // ---- Telecom & data centers ----
+  { name: "Verizon", domain: "verizon.com", hq: "New York, NY", rev: 135, type: "Telecom / data center", status: "In progress", score: 45, conf: "Documented", pqc: "research", note: "Ran publicized quantum-safe VPN trials; carries bank WAN/private-line traffic nationally." },
+  { name: "AT&T", domain: "att.com", hq: "Dallas, TX", rev: 123, type: "Telecom / data center", status: "Early stage", score: 40, conf: "Estimated", pqc: "research" },
+  { name: "Equinix", domain: "equinix.com", hq: "Redwood City, CA", rev: 9, type: "Telecom / data center", status: "Early stage", score: 38, conf: "Estimated", pqc: "research", foot: "Carrier hotels hosting bank/exchange interconnection fabric" },
+  { name: "Digital Realty", domain: "digitalrealty.com", hq: "Austin, TX", rev: 6, type: "Telecom / data center", status: "Early stage", score: 30, conf: "Estimated", pqc: "none" },
+
+  // ---- IT services & consulting ----
+  { name: "Accenture", domain: "accenture.com", hq: "Dublin, IE / New York, NY", rev: 68, type: "IT services",
+    status: "In progress", score: 60, conf: "Documented", pqc: "roadmap", note: "Dedicated quantum-security practice running PQC discovery and migration programs at major financial institutions." },
+  { name: "TCS", domain: "tcs.com", hq: "Mumbai, IN", rev: 30, type: "IT services", status: "In progress", score: 50, conf: "Inferred", pqc: "roadmap", foot: "Runs application estates for many U.S. banks; BaNCS core product" },
+  { name: "Capgemini", domain: "capgemini.com", hq: "Paris, FR", rev: 25, type: "IT services", status: "In progress", score: 55, conf: "Documented", pqc: "roadmap", note: "Quantum lab publishes Q-day readiness research; offers crypto-inventory services to banks." },
+  { name: "Cognizant", domain: "cognizant.com", hq: "Teaneck, NJ", rev: 20, type: "IT services", status: "Early stage", score: 42, conf: "Estimated", pqc: "research" },
+  { name: "Infosys", domain: "infosys.com", hq: "Bengaluru, IN", rev: 20, type: "IT services", status: "In progress", score: 48, conf: "Estimated", pqc: "research", foot: "Finacle core banking + large U.S. bank delivery centers" },
+  { name: "Kyndryl", domain: "kyndryl.com", hq: "New York, NY", rev: 15, type: "IT services", status: "In progress", score: 50, conf: "Inferred", pqc: "roadmap", foot: "Operates mainframe and infrastructure estates for large banks (ex-IBM GTS)", note: "Publishes quantum-safe readiness services aligned to IBM Z quantum-safe stack." },
+
+  // ---- ATM, cash & document ----
+  { name: "Brink's", domain: "brinks.com", hq: "Richmond, VA", rev: 5.1, type: "ATM / cash / document", status: "Not evident", score: 14, conf: "Estimated", pqc: "none", foot: "Cash logistics + ATM managed services" },
+  { name: "NCR Atleos", domain: "ncratleos.com", hq: "Atlanta, GA", rev: 4.4, type: "ATM / cash / document", status: "Early stage", score: 24, conf: "Estimated", pqc: "none", foot: "Largest U.S. ATM fleet operator — long-lived hardware with embedded crypto" },
+  { name: "Diebold Nixdorf", domain: "dieboldnixdorf.com", hq: "North Canton, OH", rev: 3.8, type: "ATM / cash / document", status: "Early stage", score: 24, conf: "Estimated", pqc: "none", foot: "ATM hardware/software — EMV key management at the device edge" },
+  { name: "Deluxe", domain: "deluxe.com", hq: "Minneapolis, MN", rev: 2.1, type: "ATM / cash / document", status: "Not evident", score: 14, conf: "Estimated", pqc: "none", foot: "Checks, lockbox, and payment processing for thousands of institutions" },
+
+  // ---- Risk, fraud & compliance ----
+  { name: "SAS", domain: "sas.com", hq: "Cary, NC", rev: 3.3, type: "Risk & compliance", status: "Early stage", score: 38, conf: "Estimated", pqc: "research", foot: "AML and model-risk platforms inside large bank risk functions" },
+  { name: "NICE Actimize", domain: "niceactimize.com", hq: "Hoboken, NJ", rev: 2.9, type: "Risk & compliance", status: "Early stage", score: 35, conf: "Estimated", pqc: "none", foot: "Financial-crime monitoring at most top-50 U.S. banks" },
+  { name: "Verafin (Nasdaq)", domain: "verafin.com", hq: "St. John's, CA", rev: 0.5, type: "Risk & compliance", status: "Early stage", score: 30, conf: "Estimated", pqc: "none", foot: "Cloud AML for 2,500+ U.S. community institutions" },
+  { name: "Feedzai", domain: "feedzai.com", hq: "Coimbra, PT", rev: 0.2, type: "Risk & compliance", status: "Early stage", score: 32, conf: "Estimated", pqc: "none" },
+  { name: "Mitek", domain: "miteksystems.com", hq: "San Diego, CA", rev: 0.19, type: "Risk & compliance", status: "Early stage", score: 28, conf: "Estimated", pqc: "none", foot: "Mobile check deposit + identity verification used across U.S. mobile banking" },
+  { name: "Abrigo", domain: "abrigo.com", hq: "Austin, TX", rev: 0.15, type: "Risk & compliance", status: "Not evident", score: 20, conf: "Estimated", pqc: "none", foot: "Community-bank compliance and lending software" },
+
+  // ---- Digital assets & fintech infrastructure ----
+  { name: "Coinbase (Institutional)", domain: "coinbase.com", hq: "Remote / U.S.", rev: 7, type: "Digital assets", status: "In progress", score: 50, conf: "Documented", pqc: "research", note: "Published research on post-quantum protection for digital-asset custody; SEC custody proposals referencing PQC algorithms directly affect its institutional business." },
+  { name: "Fireblocks", domain: "fireblocks.com", hq: "New York, NY", rev: 0.55, type: "Digital assets", status: "In progress", score: 55, conf: "Documented", pqc: "research", foot: "MPC wallet infrastructure used by banks' digital-asset desks", note: "Cryptography-first company; publishes on MPC + PQC interaction for key management." },
+  { name: "Apex Fintech Solutions", domain: "apexfintechsolutions.com", hq: "Dallas, TX", rev: 0.35, type: "Digital assets", status: "Early stage", score: 30, conf: "Estimated", pqc: "none", foot: "Clearing and custody engine behind many retail-investing apps" },
+];
+
+window.VENDORS.forEach(v => { v.kind = "vendor"; });
+window.VENDORS.sort((a, b) => b.rev - a.rev || a.name.localeCompare(b.name));
+window.VENDORS.forEach((v, i) => { v.rank = i + 1; });
