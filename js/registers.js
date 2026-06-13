@@ -39,6 +39,20 @@
       '</div></details>';
   }
 
+  // Mobile card: one tappable card per row, replacing the wide desktop table.
+  function scorePill(score) {
+    return '<span class="reg-card-score" style="background:' + scoreColor(score) + '">' + score + '</span>';
+  }
+  function regCard(action, item, lines, chips) {
+    return '<div class="reg-card" data-action="' + action + '" data-name="' + esc(item.name) + '">' +
+      '<div class="reg-card-top">' +
+      '<span class="reg-card-rank">' + String(item.rank).padStart(2, "0") + '</span>' +
+      '<span class="reg-card-name">' + esc(item.name) + '</span>' +
+      scorePill(item.score) + '</div>' +
+      '<div class="reg-card-meta">' + lines + '</div>' +
+      '<div class="reg-card-chips">' + chips + '</div></div>';
+  }
+
   /* ---- Institutions register --------------------------------------------- */
   window.renderInstitutions = function (data, opts) {
     var q = (opts.query || "").trim().toLowerCase();
@@ -74,6 +88,27 @@
       body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No institutions match. Boring, in the best way.</td></tr>';
     }
 
+    var listing;
+    if (opts.isMobile) {
+      listing = rows.length
+        ? '<div class="reg-cards">' + rows.map(function (b) {
+            return regCard("open-inst", b,
+              esc(b.domain) + ' · ' + esc(b.hq),
+              readinessBadge(b.status) +
+              '<span class="reg-tag">' + esc(b.cat) + '</span>' +
+              '<span class="reg-tag mono">' + fmtAssets(b.assets) + '</span>' +
+              tlsChip(b.tls) + (showConf ? confChip(b.conf) : ''));
+          }).join('') + '</div>'
+        : '<div class="feed-empty">No institutions match. Boring, in the best way.</div>';
+    } else {
+      listing = '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
+        '<thead><tr><th style="width:56px">#</th><th>Institution</th><th class="num" style="width:120px">Assets</th>' +
+        '<th style="width:130px">Category</th><th style="width:128px">Web TLS</th><th style="width:118px">Readiness</th>' +
+        '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
+        (showConf ? '<th style="width:106px">Evidence</th>' : '') +
+        '</tr></thead><tbody>' + body + '</tbody></table></div>';
+    }
+
     return '<div class="register">' +
       '<div class="register-toolbar">' + statusPills(opts.statusFilter, "inst-status") +
       '<span class="spacer"></span>' +
@@ -81,12 +116,7 @@
       '<span class="register-count">' + rows.length + ' of ' + data.length + '</span>' +
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +
-      '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
-      '<thead><tr><th style="width:56px">#</th><th>Institution</th><th class="num" style="width:120px">Assets</th>' +
-      '<th style="width:130px">Category</th><th style="width:128px">Web TLS</th><th style="width:118px">Readiness</th>' +
-      '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
-      (showConf ? '<th style="width:106px">Evidence</th>' : '') +
-      '</tr></thead><tbody>' + body + '</tbody></table></div>' +
+      listing +
       '<div class="register-footnote">Assets are approximate (Q1 2026). Rows marked <strong>Estimated</strong> are ' +
       'representative assessments pending a verification pass — see Methodology.</div>' +
       '</div>';
@@ -128,6 +158,28 @@
       body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No providers match. Boring, in the best way.</td></tr>';
     }
 
+    var listing;
+    if (opts.isMobile) {
+      listing = rows.length
+        ? '<div class="reg-cards">' + rows.map(function (v) {
+            return regCard("open-vendor", v,
+              esc(v.domain) + ' · ' + esc(v.hq),
+              readinessBadge(v.status) +
+              '<span class="reg-tag">' + esc(v.type) + '</span>' +
+              '<span class="reg-tag mono">' + fmtRev(v.rev) + '</span>' +
+              pqcChip(v.pqc) + (showConf ? confChip(v.conf) : ''));
+          }).join('') + '</div>'
+        : '<div class="feed-empty">No providers match. Boring, in the best way.</div>';
+    } else {
+      listing = '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
+        '<thead><tr><th style="width:56px">#</th><th>Provider</th><th style="width:160px">Type</th>' +
+        '<th class="num" style="width:104px">Revenue</th><th style="width:140px">Product PQC</th>' +
+        '<th style="width:118px">Readiness</th>' +
+        '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
+        (showConf ? '<th style="width:106px">Evidence</th>' : '') +
+        '</tr></thead><tbody>' + body + '</tbody></table></div>';
+    }
+
     return '<div class="register">' +
       '<div class="register-toolbar">' + statusPills(opts.statusFilter, "vendor-status") +
       '<span class="spacer"></span>' +
@@ -135,13 +187,7 @@
       '<span class="register-count">' + rows.length + ' of ' + data.length + '</span>' +
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +
-      '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
-      '<thead><tr><th style="width:56px">#</th><th>Provider</th><th style="width:160px">Type</th>' +
-      '<th class="num" style="width:104px">Revenue</th><th style="width:140px">Product PQC</th>' +
-      '<th style="width:118px">Readiness</th>' +
-      '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
-      (showConf ? '<th style="width:106px">Evidence</th>' : '') +
-      '</tr></thead><tbody>' + body + '</tbody></table></div>' +
+      listing +
       '<div class="register-footnote">Revenue is approximate annual revenue, company-wide unless a segment is the ' +
       'relevant unit. Readiness here means PQC support in the products and services financial institutions consume.</div>' +
       '</div>';

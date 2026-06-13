@@ -19,6 +19,7 @@
     vendorStatusFilter: "All",
     vendorType: "All",
     viewoptsOpen: false,
+    isMobile: false, // set by detectDevice() before first render
     intel: {
       standards:  { sort: "newest", q: "" },
       guidance:   { sort: "newest", q: "" },
@@ -27,6 +28,24 @@
     },
     prefs: loadPrefs(),
   };
+
+  // Device recognition: the dashboard presents the full desktop application on
+  // larger screens and a mobile-optimized view on phones/small tablets. Width
+  // is the primary signal; a coarse pointer (touch) nudges borderline devices
+  // toward the mobile view. Re-evaluated on resize and orientation change.
+  var MOBILE_MQ = window.matchMedia("(max-width: 860px)");
+  var COARSE_MQ = window.matchMedia("(pointer: coarse)");
+  function computeIsMobile() {
+    return MOBILE_MQ.matches || (COARSE_MQ.matches && window.innerWidth <= 1024);
+  }
+  function detectDevice() {
+    state.isMobile = computeIsMobile();
+    var app = document.querySelector(".app");
+    if (app) {
+      app.classList.toggle("is-mobile", state.isMobile);
+      app.classList.toggle("is-desktop", !state.isMobile);
+    }
+  }
 
   var VIEWS = {
     overview:     { title: "PQC Readiness Overview", crumb: "Monitor" },
@@ -111,10 +130,10 @@
       case "overview": main.innerHTML = renderOverview(data); break;
       case "institutions": main.innerHTML = renderInstitutions(data, {
         query: state.query, statusFilter: state.statusFilter, cat: state.instCat,
-        prefs: state.prefs, voOpen: state.viewoptsOpen }); break;
+        prefs: state.prefs, voOpen: state.viewoptsOpen, isMobile: state.isMobile }); break;
       case "vendors": main.innerHTML = renderVendors(vendorData, {
         query: state.query, statusFilter: state.vendorStatusFilter, type: state.vendorType,
-        prefs: state.prefs, voOpen: state.viewoptsOpen }); break;
+        prefs: state.prefs, voOpen: state.viewoptsOpen, isMobile: state.isMobile }); break;
       case "standards":
       case "guidance":
       case "sector":
@@ -281,8 +300,29 @@
 
   /* ---- Boot ---------------------------------------------------------------- */
   document.getElementById("app").innerHTML = shellHtml();
+  detectDevice();
   renderChrome();
   renderMain();
+
+  // Re-evaluate the device class on viewport/orientation change and re-render
+  // when crossing the desktop/mobile boundary so the layout swaps cleanly.
+  function onViewportChange() {
+    var was = state.isMobile;
+    detectDevice();
+    if (state.isMobile !== was) {
+      setNav(false);
+      renderMain();
+    }
+  }
+  if (MOBILE_MQ.addEventListener) {
+    MOBILE_MQ.addEventListener("change", onViewportChange);
+    COARSE_MQ.addEventListener("change", onViewportChange);
+  } else if (MOBILE_MQ.addListener) {
+    MOBILE_MQ.addListener(onViewportChange); // older Safari
+    COARSE_MQ.addListener(onViewportChange);
+  }
+  window.addEventListener("resize", onViewportChange);
+  window.addEventListener("orientationchange", onViewportChange);
 
   // Check every intelligence section's trusted live sources on page load.
   refreshAllFeeds(updateIntelView);
