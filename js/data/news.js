@@ -2,7 +2,7 @@
    Three sections: standards & policy, implementation guidance, financial sector news. */
 
 window.PQC_NEWS = {
-  asOf: "June 9, 2026",
+  asOf: "June 13, 2026",
 
   standards: [
     { d: "2026-05", tag: "NIST", title: "HQC draft standard in public comment; final FIPS expected 2027",

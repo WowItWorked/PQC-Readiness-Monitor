@@ -58,7 +58,7 @@
   function timeline() {
     var start = 2024, end = 2036.5;
     var pos = function (y) { return ((y - start) / (end - start)) * 100 + "%"; };
-    var now = 2026.44;
+    var now = 2026.45;
     var crqcStart = 2030;
     var marks = [
       { y: 2024.62, lane: "t2", anchor: "start", label: "FIPS 203/204/205 final", sub: "NIST · Aug 2024" },
