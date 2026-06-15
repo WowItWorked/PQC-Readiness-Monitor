@@ -163,7 +163,8 @@
       ? '<div class="drawer-h">Technology news</div><div style="display:grid">' +
         bank.news.map(function (n) {
           return '<div class="drawer-news-item"><span class="drawer-news-date">' + esc(n.d) + '</span>' +
-            '<div><div class="drawer-news-title">' + esc(n.t) + '</div>' +
+            '<div><div class="drawer-news-title"><a href="' + esc(newsUrl(n)) +
+            '" target="_blank" rel="noopener">' + esc(n.t) + '</a></div>' +
             '<div class="drawer-news-src">' + esc(n.s) + '</div></div></div>';
         }).join('') + '</div>'
       : '';

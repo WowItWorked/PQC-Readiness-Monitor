@@ -8,9 +8,9 @@
   function tag(t) { return '<span class="tag">' + esc(t) + '</span>'; }
 
   function newsItem(item) {
-    var title = item.url
-      ? '<a href="' + esc(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>'
-      : esc(item.title);
+    // Every article links to a working source (verified url, mapped source, or search).
+    var title = '<a href="' + esc(newsUrl({ url: item.url, t: item.title, s: item.src })) +
+      '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
     return '<article class="news-item">' +
       '<span class="news-date">' + esc(item.d) + '</span>' +
       '<div><div class="news-meta">' + tag(item.tag) +
@@ -18,6 +18,21 @@
       '<span class="news-src">' + esc(item.src) + '</span></div>' +
       '<h3 class="news-title">' + title + '</h3>' +
       '<p class="news-body">' + esc(item.body) + '</p></div></article>';
+  }
+
+  var PAGE_SIZE = 10;
+  // Pagination control + slice bounds for a list of `total` items.
+  function pager(total, page, section) {
+    var pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    page = Math.min(Math.max(1, page || 1), pages);
+    var from = (page - 1) * PAGE_SIZE, to = Math.min(from + PAGE_SIZE, total);
+    var html = pages <= 1 ? "" :
+      '<div class="pager">' +
+      '<button class="pager-btn" data-action="intel-page" data-section="' + section + '" data-page="' + (page - 1) + '"' + (page <= 1 ? " disabled" : "") + '>‹ Prev</button>' +
+      '<span class="pager-info">' + (from + 1) + '–' + to + ' of ' + total + ' · page ' + page + '/' + pages + '</span>' +
+      '<button class="pager-btn" data-action="intel-page" data-section="' + section + '" data-page="' + (page + 1) + '"' + (page >= pages ? " disabled" : "") + '>Next ›</button>' +
+      '</div>';
+    return { from: from, to: to, html: html };
   }
 
   var SORTS = [
@@ -149,18 +164,19 @@
         return Object.assign({ id: "guidance-doc:" + i }, n);
       });
       var docs = sortItems(curatedDocs.concat(live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
+      var dpg = pager(docs.length, opts.page, section);
       return (cards ? '<div class="guidance-grid">' + cards + '</div>'
           : emptyHtml("No practices match. Boring, in the best way.")) +
         '<div class="intel-subhead">Authoritative guidance &amp; reference documents</div>' +
-        (docs.length ? card({ pad: "6px 24px" }, docs.map(newsItem).join(''))
+        (docs.length ? card({ pad: "6px 24px" }, docs.slice(dpg.from, dpg.to).map(newsItem).join('')) + dpg.html
           : emptyHtml(q ? "No documents match." : "Nothing on the running list yet — sources are checked on every load."));
     }
 
     var curated = cfg.curated().map(function (n, i) { return Object.assign({ id: section + "-curated:" + i }, n); });
     var items = sortItems(curated.concat(live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
-    return items.length
-      ? card({ pad: "6px 24px" }, items.map(newsItem).join(''))
-      : emptyHtml("No items match. Boring, in the best way.");
+    if (!items.length) return emptyHtml("No items match. Boring, in the best way.");
+    var pg = pager(items.length, opts.page, section);
+    return card({ pad: "6px 24px" }, items.slice(pg.from, pg.to).map(newsItem).join('')) + pg.html;
   };
 
   /* ---- Full section view ---------------------------------------------------------- */
@@ -205,9 +221,9 @@
         "union, and digital banks. A parallel register tracks the top 100 third parties to the sector — core " +
         "processors, cloud and edge providers, payment networks, market utilities, security and PKI/HSM vendors — " +
         "ordered by approximate annual revenue and scored on PQC support in the products institutions consume. " +
-        "Asset and revenue figures are rounded and approximate. The TLS column reflects edge-provider " +
-        "capability and observed handshakes at snapshot time; wire this view to a live TLS scanner " +
-        "(e.g. a scheduled scan negotiating X25519MLKEM768 against each domain) to convert Estimated rows into findings.") +
+        "Asset and revenue figures are rounded and approximate. The institution TLS column is no longer assumed: " +
+        "it is populated by a real daily scan (see “Live TLS scanning” below) that negotiates X25519MLKEM768 " +
+        "against each domain, turning that signal into an observed finding.") +
       S("Live TLS scanning",
         "The Web TLS column for institutions is wired to a real daily scanner (a GitHub Action). " +
         "It dials each institution's primary website offering only the hybrid post-quantum group " +
@@ -218,14 +234,21 @@
         "(see the rating basis in any institution's detail panel), so scores — and the Readiness Trends " +
         "charts — move as institutions actually enable or drop hybrid TLS. Third parties are scored on " +
         "product PQC rather than their own website, so they are not part of this scan.") +
+      S("Daily updates & snapshot history",
+        "The published site refreshes once per day via a scheduled GitHub Action: it runs the TLS scan, records " +
+        "one dated snapshot of every readiness score, advances the “Data as of” date, and rebuilds the site. " +
+        "Re-runs the same day are no-ops, so each day produces exactly one snapshot. The <strong>Readiness " +
+        "Trends</strong> page charts that accumulating history — cohort averages, status transitions, biggest " +
+        "movers, and a per-entity tracker — so movement appears automatically as ratings change. Intelligence " +
+        "feeds additionally refresh live in the browser on every visit, so news is never more than a page-load old.") +
       S("Intelligence feeds",
-        "Each intelligence section combines a curated June 2026 snapshot with a live running list refreshed on " +
-        "every page load from trusted, browser-accessible sources: the Federal Register API (official U.S. " +
-        "policy and regulator documents), the IETF Datatracker API (standards and guidance documents), the " +
-        "Crossref API (peer-reviewed research), and — for press coverage — a strict domain allowlist of vendor " +
-        "newsrooms, sector institutions, and reputable technology press surfaced via the Hacker News API. " +
-        "Live items are deduplicated, persisted locally, capped at 200 per section, and always link to the " +
-        "original source.") +
+        "Each intelligence section combines a curated snapshot with a live running list refreshed on every page " +
+        "load from trusted, browser-accessible sources. Standards &amp; Policy draws only on official government: " +
+        "the Federal Register API (U.S.) and the GOV.UK Search API (U.K.); EU policy is included as verified " +
+        "curated links. Sector and Third-Party news add U.S. financial regulators (Federal Register) and a strict " +
+        "domain allowlist of vendor newsrooms, sector institutions, and reputable press surfaced via the Hacker " +
+        "News API. Live items are deduplicated, persisted locally, capped at 200 per section, searchable, sortable, " +
+        "paginated (10 per page), and always link to the original source.") +
       S("Anchor dates",
         "NIST FIPS 203/204/205 final August 2024 · HQC final expected 2027 · RSA/ECC deprecated after 2030 and " +
         "disallowed after 2035 (NIST IR 8547) · G7 CEG critical-systems target 2030–2032 · U.S. federal " +

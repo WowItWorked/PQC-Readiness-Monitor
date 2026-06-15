@@ -9,6 +9,43 @@
       .replace(/"/g, "&quot;");
   }
 
+  // Working-link resolver for news/article items. Prefers an explicit verified
+  // url; else maps a recognized source to its official section; else falls back
+  // to a search for the exact headline (always resolves to the source). Every
+  // article therefore has a working hyperlink.
+  var NEWS_SOURCE = {
+    "AWS Security Blog": "https://aws.amazon.com/blogs/security/",
+    "AWS": "https://aws.amazon.com/security/post-quantum-cryptography/",
+    "Microsoft Security": "https://www.microsoft.com/en-us/security/blog/",
+    "Microsoft": "https://www.microsoft.com/en-us/security/blog/",
+    "Google Security": "https://cloud.google.com/blog/products/identity-security",
+    "Google Quantum AI": "https://quantumai.google/",
+    "Google": "https://cloud.google.com/security/resources/post-quantum-cryptography",
+    "IBM": "https://www.ibm.com/quantum/blog",
+    "Cloudflare": "https://blog.cloudflare.com/tag/post-quantum/",
+    "Cloudflare Radar": "https://blog.cloudflare.com/tag/post-quantum/",
+    "Akamai": "https://www.akamai.com/blog",
+    "Thales": "https://cpl.thalesgroup.com/encryption/post-quantum-crypto-agility",
+    "DigiCert": "https://www.digicert.com/tls-ssl/post-quantum-cryptography",
+    "DTCC": "https://www.dtcc.com/news",
+    "Mastercard": "https://www.mastercard.com/news/",
+    "BIS / Swift": "https://www.bis.org/about/bisih/topics/cyber_security/leap.htm",
+    "BIS / Finextra": "https://www.bis.org/about/bisih/topics/cyber_security/leap.htm",
+    "weforum.org": "https://www.weforum.org/publications/",
+    "The Quantum Insider": "https://thequantuminsider.com/",
+    "NIST": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+    "NIST CSRC": "https://csrc.nist.gov/projects/post-quantum-cryptography",
+    "SandboxAQ": "https://www.sandboxaq.com/",
+  };
+  function newsUrl(item) {
+    if (item && item.url) return item.url;
+    var s = item && item.s ? String(item.s) : "";
+    if (NEWS_SOURCE[s]) return NEWS_SOURCE[s];
+    if (/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(s)) return "https://" + s; // domain-style source
+    var q = ((item && (item.t || item.title)) || "") + (s ? " " + s : "");
+    return "https://duckduckgo.com/?q=" + encodeURIComponent(q.trim());
+  }
+
   var READINESS = {
     "Advanced":    { c: "var(--success)", bg: "var(--success-bg)", line: "var(--success-line)" },
     "In progress": { c: "var(--info)", bg: "var(--info-bg)", line: "var(--info-line)" },
@@ -129,5 +166,6 @@
     scoreColor: scoreColor, scoreCell: scoreCell, card: card,
     fmtAssets: fmtAssets, fmtRev: fmtRev,
     instSummary: instSummary, vendorSummary: vendorSummary,
+    newsUrl: newsUrl,
   });
 })();

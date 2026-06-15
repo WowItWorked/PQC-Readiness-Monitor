@@ -21,10 +21,10 @@
     viewoptsOpen: false,
     isMobile: false, // set by detectDevice() before first render
     intel: {
-      standards:  { sort: "newest", q: "" },
-      guidance:   { sort: "newest", q: "" },
-      sector:     { sort: "newest", q: "" },
-      vendornews: { sort: "newest", q: "" },
+      standards:  { sort: "newest", q: "", page: 1 },
+      guidance:   { sort: "newest", q: "", page: 1 },
+      sector:     { sort: "newest", q: "", page: 1 },
+      vendornews: { sort: "newest", q: "", page: 1 },
     },
     trends: { cohort: "inst", entity: null },
     prefs: loadPrefs(),
@@ -220,6 +220,14 @@
         state.trends.cohort = el.getAttribute("data-cohort");
         renderMain();
         break;
+      case "intel-page": {
+        var psec = el.getAttribute("data-section");
+        state.intel[psec].page = parseInt(el.getAttribute("data-page"), 10) || 1;
+        updateIntelList(psec);
+        var listEl = document.getElementById("intel-list");
+        if (listEl) listEl.scrollIntoView({ block: "start", behavior: "smooth" });
+        break;
+      }
       case "intel-refresh": {
         var sec = el.getAttribute("data-section");
         refreshFeeds(sec, updateIntelView);
@@ -255,6 +263,7 @@
       case "intel-sort": {
         var sec = el.getAttribute("data-section");
         state.intel[sec].sort = el.value;
+        state.intel[sec].page = 1; // re-sorting returns to the first page
         updateIntelList(sec);
         break;
       }
@@ -284,6 +293,7 @@
     if (!el) return;
     var sec = el.getAttribute("data-section");
     state.intel[sec].q = el.value;
+    state.intel[sec].page = 1; // filtering returns to the first page
     updateIntelList(sec);
   });
 
