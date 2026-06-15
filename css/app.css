@@ -220,8 +220,8 @@ p.guidance-body { font-size: 13.5px; line-height: 21px; color: var(--fg-2); marg
 
 /* ---- Drawer ----------------------------------------------------------------- */
 .drawer-overlay { position: fixed; inset: 0; z-index: 40; background: rgba(7,24,42,0.45);
-  display: flex; justify-content: flex-end; }
-.drawer-panel { width: 520px; max-width: 92vw; height: 100%; background: #fff;
+  display: flex; justify-content: flex-end; overflow: hidden; }
+.drawer-panel { width: 520px; max-width: 92vw; min-width: 0; height: 100%; background: #fff;
   box-shadow: var(--shadow-lg); display: flex; flex-direction: column;
   animation: slidein var(--dur-slow) var(--ease-out); }
 .drawer-head { padding: 20px 24px; border-bottom: 1px solid var(--line-1);
@@ -264,6 +264,19 @@ p.drawer-summary { font-size: 14px; line-height: 22px; color: var(--fg-2); margi
 .drawer-evidence { margin-top: 24px; padding: 12px 14px; background: var(--bg-2);
   border: 1px solid var(--line-1); border-radius: var(--radius-sm); font-size: 12.5px;
   line-height: 1.55; color: var(--fg-2); }
+
+/* Rating basis — per-signal technical breakdown in the drawer */
+.rb-note { font-size: 12px; color: var(--fg-3); line-height: 1.5; margin-bottom: 14px; }
+.rb-list { display: grid; gap: 14px; }
+.rb-row-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.rb-label { font-size: 13px; font-weight: 700; color: var(--fg-1); flex: 1; }
+.lvl-bar { display: inline-flex; gap: 3px; flex: none; }
+.lvl-seg { width: 16px; height: 5px; border-radius: 2px; display: inline-block; }
+.rb-level { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  min-width: 66px; text-align: right; flex: none; }
+.rb-tech { font-size: 13px; line-height: 1.5; color: var(--fg-2); }
+.rb-verdict { margin-top: 14px; padding: 11px 14px; background: var(--pnc-navy);
+  color: rgba(255,255,255,0.92); border-radius: var(--radius-sm); font-size: 12.5px; line-height: 1.5; }
 
 /* ---- Mobile register cards (replace the wide table on small screens) ------ */
 .reg-cards { display: grid; gap: 10px; }
@@ -309,6 +322,11 @@ p.drawer-summary { font-size: 14px; line-height: 22px; color: var(--fg-2); margi
   .topbar-title { font-size: 17px; }
   .asof-chip { display: none; }
   .search-input { width: 160px; }
+
+  /* Full-width detail drawer on phones, so the rating analysis has room and the
+     close button is always reachable. */
+  .drawer-panel { width: 100%; max-width: 100%; }
+  .rb-label { min-width: 0; }
 
   /* Content density */
   .main-scroll { overflow-x: hidden; }
