@@ -48,9 +48,22 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Scan institution websites for hybrid post-quantum TLS
+        continue-on-error: true  # never let a flaky scan block the daily refresh
+        run: |
+          node scripts/gen-domains.mjs "$GITHUB_WORKSPACE/domains.json"
+          ( cd scanner && go run . "$GITHUB_WORKSPACE/domains.json" "$GITHUB_WORKSPACE/results.json" )
+          node scripts/build-tls-scan.mjs "$GITHUB_WORKSPACE/results.json"
+          rm -f "$GITHUB_WORKSPACE/domains.json" "$GITHUB_WORKSPACE/results.json"
+
       - name: Record daily snapshot and update date
         run: |
-          # Append today's readiness scores to the history (idempotent).
+          # Append today's (scan-adjusted) readiness scores to the history (idempotent).
           node scripts/snapshot.mjs
           # Advance the "Data as of" date shown on the page.
           TODAY="$(date -u +'%B %-d, %Y')"

@@ -35,7 +35,10 @@
         unknown: [0, "Public TLS posture for " + dom + " has not been scanned in this snapshot; this dimension is held pending a live X25519MLKEM768 handshake test."],
       };
       var t = tlsMap[bank.tls] || tlsMap.unknown;
-      dims.push({ label: "Public-web cryptography (TLS)", level: t[0], tech: t[1] });
+      var tlsTech = t[1];
+      if (bank.tlsObserved) tlsTech += " Observed directly by an automated TLS handshake" +
+        (bank.tlsScanned ? " on " + bank.tlsScanned : "") + ", not assumed.";
+      dims.push({ label: "Public-web cryptography (TLS)", level: t[0], tech: tlsTech });
 
       var rm = (sig.roadmap || "").toString(), rml = rm.toLowerCase(), pl, pt;
       if (rml.indexOf("public") >= 0) { pl = 3; pt = "Public disclosure of a quantum-safe program (" + rm + ")."; }

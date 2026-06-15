@@ -19,6 +19,20 @@ function loadWindow(path) {
 const inst = loadWindow("js/data/institutions.js").INSTITUTIONS || [];
 const vend = loadWindow("js/data/vendors.js").VENDORS || [];
 
+// Apply the same live-TLS overlay the browser uses, so recorded history matches
+// the displayed (scan-adjusted) scores exactly.
+try {
+  const adjust = (loadWindow("js/data/score-model.js").PQC_SCORE || {}).adjust;
+  const tls = fs.existsSync("js/data/tls-scan.js") ? (loadWindow("js/data/tls-scan.js").PQC_TLS || {}) : {};
+  const scan = tls.results || {};
+  if (adjust) {
+    inst.forEach((b) => {
+      const obs = scan[b.domain];
+      if (obs && obs !== "unknown") { b.score = adjust(b.score, b.tls, obs); b.tls = obs; }
+    });
+  }
+} catch (e) { /* no scan yet — record baseline scores */ }
+
 const histPath = "js/data/history.js";
 let hist = { dates: [], inst: {}, vendor: {} };
 if (fs.existsSync(histPath)) {

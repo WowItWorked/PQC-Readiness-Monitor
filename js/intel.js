@@ -208,6 +208,16 @@
         "Asset and revenue figures are rounded and approximate. The TLS column reflects edge-provider " +
         "capability and observed handshakes at snapshot time; wire this view to a live TLS scanner " +
         "(e.g. a scheduled scan negotiating X25519MLKEM768 against each domain) to convert Estimated rows into findings.") +
+      S("Live TLS scanning",
+        "The Web TLS column for institutions is wired to a real daily scanner (a GitHub Action). " +
+        "It dials each institution's primary website offering only the hybrid post-quantum group " +
+        "X25519MLKEM768; a successful TLS 1.3 handshake proves the server negotiated post-quantum key " +
+        "exchange (<strong>Hybrid live</strong>). A host that completes only a classical handshake is " +
+        "marked <strong>Classical</strong>, and an unreachable host is left unchanged. The observed result " +
+        "replaces the previously assumed value and adjusts the readiness score by up to 12 points " +
+        "(see the rating basis in any institution's detail panel), so scores — and the Readiness Trends " +
+        "charts — move as institutions actually enable or drop hybrid TLS. Third parties are scored on " +
+        "product PQC rather than their own website, so they are not part of this scan.") +
       S("Intelligence feeds",
         "Each intelligence section combines a curated June 2026 snapshot with a live running list refreshed on " +
         "every page load from trusted, browser-accessible sources: the Federal Register API (official U.S. " +
