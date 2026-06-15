@@ -33,8 +33,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 | **Overview** | KPIs, readiness distribution, size-tier breakdown, migration-deadline timeline, leaders / watch list. |
 | **Institutions** | Top 100 U.S. banks by assets — filter by status/category, search, click any row for a detail drawer. |
 | **Third Parties** | Top 100 sector providers (core processors, cloud, payments, PKI/HSM, …) by revenue. |
+| **Readiness Trends** | Charts built from the daily snapshot history: cohort average over time, status-mix transitions, biggest movers, and a per-entity score tracker. |
 | **Intelligence** | Standards & Policy, Implementation Guidance, Sector News, Third-Party News — each a curated snapshot **plus a live feed** refreshed on every load. |
 | **Methodology** | How readiness scores, evidence levels, and the feeds work. |
+
+Each detail drawer also includes a **Rating basis — technical analysis** section
+that decomposes the score into its four signal dimensions with a strength level
+and a technical rationale, so the confidence behind every rating is transparent.
+
+## Snapshot history & trends
+
+The daily Action records one snapshot of every entity's readiness score into
+`js/data/history.js`. The **Readiness Trends** page reads that history and renders
+(inline SVG, no chart library) how ratings transition over time — per cohort and
+per entity. Scores are flat while the underlying curated data is unchanged; the
+charts surface movement automatically once a rating changes.
 
 ## Intelligence feeds
 

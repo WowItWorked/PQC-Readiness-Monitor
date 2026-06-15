@@ -112,6 +112,24 @@ input:focus, select:focus { border-color: var(--line-focus) !important; box-shad
   font-size: 11.5px; color: var(--fg-3); margin-top: 8px; }
 .tl-footnote { font-size: 12px; color: var(--fg-3); margin-top: 12px; line-height: 1.5; text-wrap: pretty; }
 
+/* ---- Trends --------------------------------------------------------------- */
+.trends { padding: 28px; display: grid; gap: 20px; max-width: 1320px; }
+.trends-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
+.trends-summary { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px;
+  line-height: 1.5; color: var(--fg-2); background: var(--pnc-orange-050);
+  border: 1px solid var(--pnc-orange-100); border-radius: var(--radius-md); padding: 14px 16px; }
+.trends-summary strong { color: var(--fg-1); }
+.trends-toggle { display: inline-flex; border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+  overflow: hidden; margin-bottom: 14px; }
+.trends-toggle button { font-size: 13px; font-weight: 600; padding: 6px 14px; border: none;
+  background: #fff; color: var(--fg-2); cursor: pointer; }
+.trends-toggle button + button { border-left: 1px solid var(--line-2); }
+.trends-toggle button.active { background: var(--pnc-navy); color: #fff; }
+.trends-explorer-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.trends-explorer-head .select-ctl { max-width: 320px; }
+.trends-entity-now { display: inline-flex; align-items: center; gap: 10px; }
+.trends-entity-delta { font-size: 12.5px; color: var(--fg-3); }
+
 /* ---- Registers ------------------------------------------------------------ */
 .register { padding: 28px; max-width: 1320px; }
 .register-toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
@@ -330,13 +348,15 @@ p.drawer-summary { font-size: 14px; line-height: 22px; color: var(--fg-2); margi
 
   /* Content density */
   .main-scroll { overflow-x: hidden; }
-  .overview, .register, .news-wrap, .guidance-wrap, .method-wrap { padding: 18px 16px; }
-  .overview { gap: 16px; }
+  .overview, .register, .news-wrap, .guidance-wrap, .method-wrap, .trends { padding: 18px 16px; }
+  .overview, .trends { gap: 16px; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .dist-grid, .movers-grid, .guidance-grid { grid-template-columns: 1fr; }
+  .dist-grid, .movers-grid, .guidance-grid, .trends-grid { grid-template-columns: 1fr; }
   /* Grid items must be allowed to shrink below their content so inner scroll
      containers (timeline, tables) scroll instead of stretching the page. */
-  .overview > *, .kpi-grid > *, .dist-grid > *, .movers-grid > *, .guidance-grid > * { min-width: 0; }
+  .overview > *, .kpi-grid > *, .dist-grid > *, .movers-grid > *, .guidance-grid > *,
+  .trends > *, .trends-grid > * { min-width: 0; }
+  .trends-explorer-head .select-ctl { max-width: 100%; width: 100%; }
 
   /* Wide tables scroll horizontally instead of overflowing the viewport. */
   .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }

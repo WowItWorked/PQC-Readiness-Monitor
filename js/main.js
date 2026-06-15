@@ -26,6 +26,7 @@
       sector:     { sort: "newest", q: "" },
       vendornews: { sort: "newest", q: "" },
     },
+    trends: { cohort: "inst", entity: null },
     prefs: loadPrefs(),
   };
 
@@ -55,6 +56,7 @@
     guidance:     { title: "Implementation Guidance", crumb: "Intelligence" },
     sector:       { title: "Financial Sector News", crumb: "Intelligence" },
     vendornews:   { title: "Third-Party News", crumb: "Intelligence" },
+    trends:       { title: "Readiness Trends", crumb: "Monitor" },
     methodology:  { title: "Methodology", crumb: "Reference" },
   };
 
@@ -63,6 +65,7 @@
       ["overview", "Overview", "layout-dashboard"],
       ["institutions", "Institutions", "landmark"],
       ["vendors", "Third Parties", "boxes"],
+      ["trends", "Readiness Trends", "trending-up"],
     ]},
     { label: "Intelligence", items: [
       ["standards", "Standards & Policy", "scale"],
@@ -140,6 +143,7 @@
       case "vendornews":
         main.innerHTML = renderIntelSection(state.active, state.intel[state.active]);
         break;
+      case "trends": main.innerHTML = renderTrends(state.trends); break;
       case "methodology": main.innerHTML = renderMethodology(); break;
     }
     main.scrollTop = 0;
@@ -212,6 +216,10 @@
         if (el.classList.contains("drawer-overlay") && e.target.closest(".drawer-panel")) return;
         closeDrawer();
         break;
+      case "trends-cohort":
+        state.trends.cohort = el.getAttribute("data-cohort");
+        renderMain();
+        break;
       case "intel-refresh": {
         var sec = el.getAttribute("data-section");
         refreshFeeds(sec, updateIntelView);
@@ -238,6 +246,10 @@
         break;
       case "vendor-type":
         state.vendorType = el.value;
+        renderMain();
+        break;
+      case "trends-entity":
+        state.trends.entity = el.value;
         renderMain();
         break;
       case "intel-sort": {

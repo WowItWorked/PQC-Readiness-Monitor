@@ -43,18 +43,26 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Update "Data as of" date to today
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Record daily snapshot and update date
         run: |
+          # Append today's readiness scores to the history (idempotent).
+          node scripts/snapshot.mjs
+          # Advance the "Data as of" date shown on the page.
           TODAY="$(date -u +'%B %-d, %Y')"
           echo "Setting snapshot date to: $TODAY"
           sed -i "s/asOf: \"[^\"]*\"/asOf: \"$TODAY\"/" js/data/news.js
-          if git diff --quiet -- js/data/news.js; then
-            echo "Date already current — no commit needed."
+          if git diff --quiet; then
+            echo "Nothing changed — no commit needed."
           else
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add js/data/news.js
-            git commit -m "Daily refresh: snapshot date $TODAY"
+            git add -A
+            git commit -m "Daily snapshot: $TODAY"
             git push
           fi
 
