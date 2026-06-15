@@ -2,9 +2,9 @@
    score into js/data/history.js. Run by the daily GitHub Action.
 
    The data files assign to a `window` global, so we evaluate them in a tiny
-   sandbox (no DOM needed) and read the arrays back. Idempotent: if today's date
-   is already recorded, it does nothing — so the workflow's safety-net run is a
-   harmless no-op. */
+   sandbox (no DOM needed) and read the arrays back. Upserts today's column, so
+   re-runs (the safety-net run, or a later run after the TLS scan) simply refresh
+   today's values rather than duplicating the date. */
 
 import fs from "node:fs";
 import vm from "node:vm";
@@ -40,29 +40,28 @@ if (fs.existsSync(histPath)) {
 }
 
 const today = new Date().toISOString().slice(0, 10);
-if (hist.dates.includes(today)) {
-  console.log(`Snapshot for ${today} already present; nothing to do.`);
-  process.exit(0);
-}
+// Upsert today's column: append a new date, or rewrite today's values if the day
+// already exists (e.g. a later run after the TLS scan updated scores). This keeps
+// the latest history point consistent with the live, scan-adjusted scores.
+let writeIdx = hist.dates.indexOf(today);
+if (writeIdx < 0) { writeIdx = hist.dates.length; hist.dates.push(today); }
 
-const idx = hist.dates.length; // count of prior dates each series should hold
-hist.dates.push(today);
-
-function append(group, list) {
+function upsert(group, list) {
   const present = {};
   list.forEach((x) => {
     present[x.name] = true;
-    if (!group[x.name]) { group[x.name] = []; }
-    while (group[x.name].length < idx) group[x.name].push(null); // backfill new entities
-    group[x.name].push(x.score);
+    if (!group[x.name]) group[x.name] = [];
+    while (group[x.name].length <= writeIdx) group[x.name].push(null); // pad new entities
+    group[x.name][writeIdx] = x.score;
   });
-  // entities that dropped out of the current dataset get a null for today
+  // entities no longer in the dataset keep a null for this date
   Object.keys(group).forEach((k) => {
-    if (!present[k]) { while (group[k].length < idx) group[k].push(null); group[k].push(null); }
+    while (group[k].length <= writeIdx) group[k].push(null);
+    if (!present[k]) group[k][writeIdx] = null;
   });
 }
-append(hist.inst, inst);
-append(hist.vendor, vend);
+upsert(hist.inst, inst);
+upsert(hist.vendor, vend);
 
 const header =
   "/* PQC Readiness Monitor — daily snapshot history.\n" +
