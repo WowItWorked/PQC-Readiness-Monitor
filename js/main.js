@@ -57,6 +57,7 @@
     sector:       { title: "Financial Sector News", crumb: "Intelligence" },
     vendornews:   { title: "Third-Party News", crumb: "Intelligence" },
     trends:       { title: "Readiness Trends", crumb: "Monitor" },
+    locations:    { title: "Locations & Hazards", crumb: "Resilience" },
     methodology:  { title: "Methodology", crumb: "Reference" },
   };
 
@@ -66,6 +67,9 @@
       ["institutions", "Institutions", "landmark"],
       ["vendors", "Third Parties", "boxes"],
       ["trends", "Readiness Trends", "trending-up"],
+    ]},
+    { label: "Resilience", items: [
+      ["locations", "Locations & Hazards", "map-pin"],
     ]},
     { label: "Intelligence", items: [
       ["standards", "Standards & Policy", "scale"],
@@ -129,6 +133,9 @@
     var main = document.getElementById("main");
     var data = window.INSTITUTIONS;
     var vendorData = window.VENDORS;
+    // Tear down the live locations view whenever we (re)render, so its timer and
+    // listeners never leak; it re-mounts below only when it is the active view.
+    if (window.LOCATIONS_VIEW) window.LOCATIONS_VIEW.unmount();
     switch (state.active) {
       case "overview": main.innerHTML = renderOverview(data); break;
       case "institutions": main.innerHTML = renderInstitutions(data, {
@@ -144,6 +151,10 @@
         main.innerHTML = renderIntelSection(state.active, state.intel[state.active]);
         break;
       case "trends": main.innerHTML = renderTrends(state.trends); break;
+      case "locations":
+        main.innerHTML = window.LOCATIONS_VIEW.render();
+        window.LOCATIONS_VIEW.mount();
+        break;
       case "methodology": main.innerHTML = renderMethodology(); break;
     }
     main.scrollTop = 0;
