@@ -110,6 +110,10 @@
       '<div class="search-wrap">' + icon("search", 17) +
       '<input class="search-input" id="global-search" placeholder="Search institutions…"></div>' +
       '</header>' +
+      '<div role="note" style="display:flex; align-items:flex-start; gap:10px; padding:10px 28px; background:var(--warning-bg); border-bottom:1px solid var(--warning-line); flex:none;">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.73-2Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>' +
+      '<div style="font-size:12.5px; line-height:1.5; color:var(--fg-1);"><b style="color:var(--warning); font-weight:700;">Prototype &mdash; for demonstration purposes only.</b> This dashboard and the information it contains were developed as part of a prototype/demonstration. Content has not been fully vetted and should not be relied upon for decision-making purposes.</div>' +
+      '</div>' +
       '<main class="main-scroll" id="main"></main>' +
       '</div>' +
       '<div class="nav-backdrop" data-action="close-nav"></div>' +
