@@ -7,7 +7,7 @@
    The live feeds in feeds.js extend each section on every page load. */
 
 window.PQC_NEWS = {
-  asOf: "July 14, 2026",
+  asOf: "July 15, 2026",
 
   /* ---- Standards & Policy — official U.S. / U.K. / EU government only ------ */
   standards: [
