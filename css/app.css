@@ -108,7 +108,21 @@ input:focus, select:focus { border-color: var(--line-focus) !important; box-shad
   letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .hero-stat-value span { font-size: 18px; color: rgba(255,255,255,0.55); font-weight: 500; }
 .hero-stat-label { font-size: 13.5px; font-weight: 700; margin-top: 8px; }
-.hero-stat-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+/* Evidence behind each hero figure: documented (solid) → inferred → estimated (faint). */
+.hero-evidence { margin-top: 8px; font-size: 12px; line-height: 1.45; color: rgba(255,255,255,0.62); }
+.ev-bar { display: flex; height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 7px;
+  background: rgba(255,255,255,0.08); max-width: 220px; }
+.ev-documented { background: var(--brand-accent); }
+.ev-inferred { background: rgba(255,255,255,0.45); }
+.ev-estimated { background: rgba(255,255,255,0.16); }
+.ev-key { white-space: nowrap; }
+.ev-key-documented { color: #fff; font-weight: 600; }
+.etr-type p.hero-caveat { display: flex; gap: 9px; align-items: flex-start; margin: 22px 0 0;
+  padding: 12px 14px; max-width: 860px; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); }
+.hero-caveat .icn { color: var(--brand-accent); margin-top: 2px; }
+.hero-caveat strong { color: #fff; font-weight: 600; }
+.hero-caveat a { color: #fff; text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,0.45); white-space: nowrap; }
 
 /* Visible keyboard focus everywhere (links/buttons previously had none). */
 a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible {

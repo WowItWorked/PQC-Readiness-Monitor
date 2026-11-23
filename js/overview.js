@@ -159,17 +159,41 @@
   // NIST IR 8547: quantum-vulnerable public-key algorithms deprecated after 2030.
   var DEPRECATION = new Date(2031, 0, 1);
 
-  function heroStat(value, label, sub) {
+  // `evidence` is pre-built HTML describing how well-grounded the figure is.
+  function heroStat(value, label, evidence) {
     return '<div class="hero-stat"><div class="hero-stat-value">' + value + '</div>' +
       '<div class="hero-stat-label">' + esc(label) + '</div>' +
-      (sub ? '<div class="hero-stat-sub">' + esc(sub) + '</div>' : '') + '</div>';
+      '<div class="hero-evidence">' + evidence + '</div></div>';
+  }
+
+  // Evidence mix for a set of ratings: a thin proportional bar plus counts,
+  // so a reader can see how much of a headline figure rests on disclosure.
+  var CONF_ORDER = ["Documented", "Inferred", "Estimated"];
+  function evidenceMix(list) {
+    var n = list.length;
+    var c = { Documented: 0, Inferred: 0, Estimated: 0 };
+    list.forEach(function (x) { if (c[x.conf] != null) c[x.conf]++; });
+    var bar = n ? '<span class="ev-bar" aria-hidden="true">' + CONF_ORDER.map(function (k) {
+      return c[k] ? '<span class="ev-' + k.toLowerCase() + '" style="width:' + (c[k] / n) * 100 + '%"></span>' : '';
+    }).join('') + '</span>' : '';
+    var text = CONF_ORDER.filter(function (k) { return c[k]; }).map(function (k) {
+      return '<span class="ev-key ev-key-' + k.toLowerCase() + '">' + c[k] + ' ' + k.toLowerCase() + '</span>';
+    }).join(' · ');
+    return bar + '<span class="ev-text">' + text + '</span>';
   }
 
   function hero(data) {
     var vendors = window.VENDORS || [];
-    var active = data.filter(function (b) { return b.status === "Advanced" || b.status === "In progress"; }).length;
-    var shipping = vendors.filter(function (v) { return v.pqc === "shipping"; }).length;
-    var live = data.filter(function (b) { return b.tls === "live"; }).length;
+    var activeList = data.filter(function (b) { return b.status === "Advanced" || b.status === "In progress"; });
+    var shippingList = vendors.filter(function (v) { return v.pqc === "shipping"; });
+    var liveList = data.filter(function (b) { return b.tls === "live"; });
+    var observed = liveList.filter(function (b) { return b.tlsObserved; }).length;
+    var scanned = data.filter(function (b) { return b.tlsObserved; }).length;
+    var estimated = data.filter(function (b) { return b.conf === "Estimated"; }).length;
+    var tlsEvidence = '<span class="ev-text">' + (observed === liveList.length
+      ? (liveList.length ? "All " + observed : "None") + " observed by the daily TLS handshake scan"
+      : observed + " observed by scan · " + (liveList.length - observed) + " assumed") +
+      (scanned ? " (" + scanned + " sites scanned)" : "") + '</span>';
     var years = Math.max(0, (DEPRECATION - new Date()) / (365.25 * 864e5));
     return '<section class="hero" aria-labelledby="hero-title">' + latticeSvg() +
       '<div class="hero-inner">' +
@@ -186,11 +210,17 @@
       '<a class="hero-link" href="#methodology" data-view="methodology">How readiness is scored</a>' +
       '</div>' +
       '<div class="hero-stats">' +
-      heroStat(active + '<span>/' + data.length + '</span>', "Institutions with active programs", "Advanced or in-progress public signals") +
-      heroStat(shipping + '<span>/' + vendors.length + '</span>', "Third parties shipping PQC", "Available in products banks consume") +
-      heroStat(String(live), "Bank websites on hybrid TLS", "ML-KEM key exchange observed") +
-      heroStat(years.toFixed(1) + '<span> yrs</span>', "Until RSA/ECC deprecation", "NIST IR 8547 \u00b7 after 2030") +
-      '</div></div></section>';
+      heroStat(activeList.length + '<span>/' + data.length + '</span>', "Institutions with active programs", evidenceMix(activeList)) +
+      heroStat(shippingList.length + '<span>/' + vendors.length + '</span>', "Third parties shipping PQC", evidenceMix(shippingList)) +
+      heroStat(String(liveList.length), "Bank websites on hybrid TLS", tlsEvidence) +
+      heroStat(years.toFixed(1) + '<span> yrs</span>', "Until RSA/ECC deprecation",
+        '<span class="ev-text">Published guidance · NIST IR 8547, after 2030</span>') +
+      '</div>' +
+      (estimated ? '<p class="hero-caveat">' + icon("info", 15) + '<span><strong>' + estimated + ' of ' + data.length +
+        ' institution ratings are still placeholder estimates</strong> awaiting a research pass, so treat ' +
+        'program counts as indicative. Scan results and documented ratings are the firmest signals. ' +
+        '<a href="#methodology" data-view="methodology">How ratings are evidenced</a></span></p>' : '') +
+      '</div></section>';
   }
 
   /* ---- Leaders / watch list ---------------------------------------------- */
