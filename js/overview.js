@@ -93,7 +93,7 @@
         'text-align:' + (startAnchored ? "left" : "center") + '">' +
         '<div style="position:absolute;top:' + (AXIS - 3) + 'px;left:' + (startAnchored ? "0" : "50%") + ';' +
         'transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#fff;' +
-        'border:2.5px solid var(--pnc-navy);z-index:2"></div>' +
+        'border:2.5px solid var(--brand-ink);z-index:2"></div>' +
         stem +
         '<div style="position:absolute;left:0;right:0;' + laneStyle[m.lane] + '">' +
         '<div style="font-size:12px;font-weight:700;color:var(--fg-1);line-height:1.25">' + m.label + '</div>' +
@@ -113,12 +113,12 @@
       'Projected CRQC window — estimates cluster 2030+</div>' +
       // axis
       '<div style="position:absolute;top:' + AXIS + 'px;left:0;right:0;height:4px;background:var(--gray-100);border-radius:2px"></div>' +
-      '<div style="position:absolute;top:' + AXIS + 'px;left:0;width:' + pos(now) + ';height:4px;background:var(--pnc-blue);border-radius:2px"></div>' +
+      '<div style="position:absolute;top:' + AXIS + 'px;left:0;width:' + pos(now) + ';height:4px;background:var(--brand-blue);border-radius:2px"></div>' +
       // today: tick through the axis + caption in the clear zone below
       '<div style="position:absolute;left:' + pos(now) + ';top:' + (AXIS - 12) + 'px;transform:translateX(-50%);text-align:center">' +
-      '<div style="width:2px;height:28px;background:var(--pnc-orange);margin:0 auto"></div>' +
+      '<div style="width:2px;height:28px;background:var(--brand-accent);margin:0 auto"></div>' +
       '<div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;' +
-      'color:var(--pnc-orange);margin-top:4px;white-space:nowrap">Today</div></div>' +
+      'color:var(--brand-accent);margin-top:4px;white-space:nowrap">Today</div></div>' +
       marksHtml +
       '</div>' +
       '<div class="tl-axis-years">' + [2024, 2026, 2028, 2030, 2032, 2034, 2036].map(function (y) {

@@ -90,9 +90,9 @@
   function confChip(conf) {
     var solid = conf === "Documented";
     return '<span style="font-size:11px;font-weight:600;color:' +
-      (solid ? "var(--pnc-navy)" : "var(--fg-3)") + ';border:1px ' +
+      (solid ? "var(--brand-ink)" : "var(--fg-3)") + ';border:1px ' +
       (conf === "Estimated" ? "dashed" : "solid") + ' ' +
-      (solid ? "var(--pnc-navy)" : "var(--line-2)") +
+      (solid ? "var(--brand-ink)" : "var(--line-2)") +
       ';padding:1px 8px;border-radius:var(--radius-pill);white-space:nowrap">' + esc(conf) + '</span>';
   }
 

@@ -150,10 +150,10 @@
     // Cohort average line
     var avgCard = card({ title: "Average readiness over time", sub: "Mean score across each cohort · 0–100" },
       lineChart(dates, [
-        { label: "Institutions", color: "var(--pnc-navy)", points: instAvg },
-        { label: "Third parties", color: "var(--pnc-orange)", points: vAvg },
+        { label: "Institutions", color: "var(--brand-ink)", points: instAvg },
+        { label: "Third parties", color: "var(--brand-accent)", points: vAvg },
       ]) +
-      legend([{ label: "Institutions", c: "var(--pnc-navy)" }, { label: "Third parties", c: "var(--pnc-orange)" }]));
+      legend([{ label: "Institutions", c: "var(--brand-ink)" }, { label: "Third parties", c: "var(--brand-accent)" }]));
 
     // Status mix stacked bars with cohort toggle
     var toggle = '<div class="trends-toggle">' +
@@ -200,7 +200,7 @@
       ec.chart);
 
     return '<div class="trends">' +
-      '<div class="trends-summary">' + icon("trending-up", 16, "var(--pnc-orange)") +
+      '<div class="trends-summary">' + icon("trending-up", 16, "var(--brand-accent)") +
       '<span><strong>' + dates.length + ' snapshot' + (dates.length === 1 ? "" : "s") + '</strong> captured · ' + esc(range) +
       '. A new snapshot is recorded each day; the charts show how readiness transitions over time.</span></div>' +
       avgCard +

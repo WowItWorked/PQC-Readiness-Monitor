@@ -97,8 +97,13 @@
     return '<div class="app">' +
       '<aside class="sidebar">' +
       '<div class="sidebar-head"><span class="logo">' +
-      '<span class="logo-roundel"><span></span></span>' +
-      '<span class="logo-text"><span>Financial Sector</span><span>PQC Readiness</span></span>' +
+      '<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">' +
+      '<path d="M16 2 28.1 9v14L16 30 3.9 23V9Z" fill="var(--brand-accent)"/>' +
+      '<g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.9">' +
+      '<path d="M10 12.5h12M8.5 19.5h15M10 12.5l-1.5 7M16 12.5l-1.5 7M22 12.5l1.5 7"/></g>' +
+      '<g fill="#fff"><circle cx="10" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="22" cy="12.5" r="1.9"/>' +
+      '<circle cx="8.5" cy="19.5" r="1.9"/><circle cx="14.5" cy="19.5" r="1.9"/><circle cx="23.5" cy="19.5" r="1.9"/></g></svg>' +
+      '<span class="logo-text"><span class="logo-kicker">Emerging Tech Risk</span><span>Financial Sector</span><span>PQC Readiness</span></span>' +
       '</span></div>' +
       '<nav class="sidebar-nav" id="nav"></nav>' +
       '<div class="sidebar-foot">Snapshot compiled ' + esc(window.PQC_NEWS.asOf) +
