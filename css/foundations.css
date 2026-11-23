@@ -1,33 +1,32 @@
 /* ============================================================================
-   PNC DESIGN SYSTEM — Foundations
+   EMERGING TECH RISK — Design foundations
    Colors, typography, spacing, radii, elevation.
-   "Brilliantly Boring": sturdy, legible, trustworthy. No flourish for its own sake.
-
-   Fonts are Google Fonts SUBSTITUTES for PNC's licensed brand faces — see README.
-   Load this file AND the font <link> (or @import below) on any page.
+   Sober and legible: an analytics identity (ink chrome, teal accent), with
+   restrained status colors that carry meaning in every chart.
+   Fonts: Public Sans, Source Serif 4, IBM Plex Mono (Google Fonts, open licence).
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300..800;1,400..600&family=Source+Serif+4:opsz,wght@8..60,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
   /* --- Brand core ------------------------------------------------------- */
-  --pnc-orange:        #F58025;  /* Willpower Orange — primary brand mark / accent */
-  --pnc-orange-600:    #E06E14;  /* hover */
-  --pnc-orange-700:    #C75E0B;  /* pressed */
-  --pnc-orange-100:    #FDEAD7;  /* tint / wash */
-  --pnc-orange-050:    #FEF6EE;
+  --brand-accent:      #14A3A1;  /* Teal — primary accent / calls to action */
+  --brand-accent-600:  #0F8C8A;  /* hover */
+  --brand-accent-700:  #0B7472;  /* pressed; accent text on light surfaces (AA) */
+  --brand-accent-100:  #CCEFEE;  /* tint / wash */
+  --brand-accent-050:  #EEF9F9;
 
-  --pnc-blue:          #0069AA;  /* PNC Blue — links, secondary actions, info */
-  --pnc-blue-600:      #005A93;
-  --pnc-blue-700:      #004A79;
-  --pnc-blue-100:      #D7EBF5;
-  --pnc-blue-050:      #EFF7FB;
+  --brand-blue:        #2563EB;  /* Links, secondary actions */
+  --brand-blue-600:    #1D4ED8;
+  --brand-blue-700:    #1E40AF;
+  --brand-blue-100:    #DBEAFE;
+  --brand-blue-050:    #EFF6FF;
 
-  --pnc-navy:          #10314F;  /* Deep navy — headers, trust surfaces, primary chrome */
-  --pnc-navy-700:      #0B2438;
-  --pnc-navy-900:      #07182A;
+  --brand-ink:         #0F1B24;  /* Ink slate — chrome, headers, trust surfaces */
+  --brand-ink-700:     #0A141B;
+  --brand-ink-900:     #060D12;
 
-  /* --- Neutrals (warm-cool balanced gray ramp) -------------------------- */
+/* --- Neutrals (warm-cool balanced gray ramp) -------------------------- */
   --gray-000:          #FFFFFF;
   --gray-025:          #FAFAFA;
   --gray-050:          #F4F5F6;
@@ -46,16 +45,16 @@
   --fg-2:    var(--gray-600);   /* secondary text */
   --fg-3:    var(--gray-500);   /* tertiary / captions */
   --fg-onbrand: #FFFFFF;        /* text on navy / orange / blue */
-  --fg-link: var(--pnc-blue);
+  --fg-link: var(--brand-blue);
 
   --bg-1:    #FFFFFF;           /* base surface */
   --bg-2:    var(--gray-050);   /* app canvas / subtle fill */
   --bg-3:    var(--gray-100);   /* sunken / hover fill */
-  --bg-brand: var(--pnc-navy);  /* chrome / headers */
+  --bg-brand: var(--brand-ink);  /* chrome / headers */
 
   --line-1:  var(--gray-200);   /* default border / divider */
   --line-2:  var(--gray-300);   /* stronger border */
-  --line-focus: var(--pnc-blue);
+  --line-focus: var(--brand-blue);
 
   /* --- Semantic: status (banking-grade, muted not neon) ----------------- */
   --success:      #1B7F4B;  --success-bg: #E7F4EC;  --success-line: #BFE0CC;
@@ -99,11 +98,11 @@
   --radius-lg: 10px; --radius-xl: 16px; --radius-pill: 999px;
 
   /* --- Elevation (low, soft, cool-gray — never colored) ---------------- */
-  --shadow-xs: 0 1px 2px rgba(16, 49, 79, 0.06);
-  --shadow-sm: 0 1px 3px rgba(16, 49, 79, 0.08), 0 1px 2px rgba(16, 49, 79, 0.06);
-  --shadow-md: 0 4px 10px rgba(16, 49, 79, 0.08), 0 2px 4px rgba(16, 49, 79, 0.06);
-  --shadow-lg: 0 12px 28px rgba(16, 49, 79, 0.12), 0 4px 8px rgba(16, 49, 79, 0.06);
-  --ring-focus: 0 0 0 3px rgba(0, 105, 170, 0.35);
+  --shadow-xs: 0 1px 2px rgba(15, 27, 36, 0.06);
+  --shadow-sm: 0 1px 3px rgba(15, 27, 36, 0.08), 0 1px 2px rgba(15, 27, 36, 0.06);
+  --shadow-md: 0 4px 10px rgba(15, 27, 36, 0.08), 0 2px 4px rgba(15, 27, 36, 0.06);
+  --shadow-lg: 0 12px 28px rgba(15, 27, 36, 0.12), 0 4px 8px rgba(15, 27, 36, 0.06);
+  --ring-focus: 0 0 0 3px rgba(37, 99, 235, 0.35);
 
   /* --- Motion (quick, no bounce — composed and steady) ----------------- */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -112,10 +111,10 @@
 }
 
 /* ============================================================================
-   SEMANTIC ELEMENT DEFAULTS — opt-in via .pnc-type scope to avoid clobbering
-   host pages. Apply class="pnc-type" on a wrapper to inherit these.
+   SEMANTIC ELEMENT DEFAULTS — opt-in via .etr-type scope to avoid clobbering
+   host pages. Apply class="etr-type" on a wrapper to inherit these.
    ========================================================================== */
-.pnc-type {
+.etr-type {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--lh-base);
@@ -125,44 +124,44 @@
   text-rendering: optimizeLegibility;
 }
 
-.pnc-type h1, .pnc-h1 {
+.etr-type h1, .etr-h1 {
   font-family: var(--font-serif);
   font-size: var(--text-3xl); line-height: var(--lh-3xl);
   font-weight: var(--fw-bold); letter-spacing: -0.01em; color: var(--fg-1);
   margin: 0;
 }
-.pnc-type h2, .pnc-h2 {
+.etr-type h2, .etr-h2 {
   font-family: var(--font-serif);
   font-size: var(--text-2xl); line-height: var(--lh-2xl);
   font-weight: var(--fw-semibold); letter-spacing: -0.005em; margin: 0;
 }
-.pnc-type h3, .pnc-h3 {
+.etr-type h3, .etr-h3 {
   font-family: var(--font-sans);
   font-size: var(--text-xl); line-height: var(--lh-xl);
   font-weight: var(--fw-bold); margin: 0;
 }
-.pnc-type h4, .pnc-h4 {
+.etr-type h4, .etr-h4 {
   font-family: var(--font-sans);
   font-size: var(--text-lg); line-height: var(--lh-lg);
   font-weight: var(--fw-semibold); margin: 0;
 }
-.pnc-eyebrow {
+.etr-eyebrow {
   font-family: var(--font-sans);
   font-size: var(--text-xs); line-height: var(--lh-xs);
   font-weight: var(--fw-bold); letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--pnc-orange);
+  color: var(--brand-accent-700);
 }
-.pnc-type p, .pnc-body {
+.etr-type p, .etr-body {
   font-size: var(--text-base); line-height: var(--lh-base);
   color: var(--fg-2); margin: 0; text-wrap: pretty;
 }
-.pnc-lead {
+.etr-lead {
   font-size: var(--text-md); line-height: var(--lh-md); color: var(--fg-2);
 }
-.pnc-small, .pnc-caption {
+.etr-small, .etr-caption {
   font-size: var(--text-sm); line-height: var(--lh-sm); color: var(--fg-3);
 }
-.pnc-data, .pnc-mono {
+.etr-data, .etr-mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
 }

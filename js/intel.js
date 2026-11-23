@@ -1,10 +1,29 @@
 /* PQC Readiness Monitor — intelligence views: Standards & Policy, Implementation
    Guidance, Financial Sector News, Third-Party News, and Methodology.
-   Every feed section merges the curated June 2026 snapshot with the live
+   Every feed section merges the curated baseline snapshot with the live
    running list (see feeds.js) and is searchable, sortable, and refreshable;
    live items link to the original source. */
 
 (function () {
+  // Curated + live, dropping live items that repeat a curated one (same link or
+  // same headline) so a document never appears twice in a feed.
+  function itemKey(u) {
+    return String(u || "").toLowerCase().replace(/^https?:\/\/(www\.)?/, "").replace(/[?#].*$/, "")
+      .replace(/\.html?$/, "").replace(/\/$/, "");
+  }
+  function mergeUnique(curated, live) {
+    var seen = {};
+    curated.forEach(function (it) {
+      if (it.url) seen["u:" + itemKey(it.url)] = true;
+      var t = it.title || it.t;
+      if (t) seen["t:" + String(t).toLowerCase().trim()] = true;
+    });
+    return curated.concat(live.filter(function (it) {
+      var t = it.title || it.t;
+      return !(it.url && seen["u:" + itemKey(it.url)]) && !(t && seen["t:" + String(t).toLowerCase().trim()]);
+    }));
+  }
+
   function tag(t) { return '<span class="tag">' + esc(t) + '</span>'; }
 
   function newsItem(item) {
@@ -123,9 +142,9 @@
       '<span class="feed-status' + (loading ? ' loading' : '') + '" id="feed-status">' +
       esc(feedStatusLine(section)) + '</span>' +
       '<span class="spacer"></span>' +
-      '<input class="feed-search" type="search" placeholder="Filter this feed…" value="' + esc(opts.q || "") +
+      '<input class="feed-search" type="search" aria-label="Filter this feed" placeholder="Filter this feed…" value="' + esc(opts.q || "") +
       '" data-action="intel-search" data-section="' + section + '">' +
-      '<select class="select-ctl" data-action="intel-sort" data-section="' + section + '">' + sortOptions + '</select>' +
+      '<select class="select-ctl" aria-label="Sort order" data-action="intel-sort" data-section="' + section + '">' + sortOptions + '</select>' +
       '<button class="pill-btn" data-action="intel-refresh" data-section="' + section + '"' +
       (loading ? ' disabled' : '') + '>Refresh</button>' +
       '</div>';
@@ -163,7 +182,7 @@
       var curatedDocs = (window.PQC_NEWS.guidanceDocs || []).map(function (n, i) {
         return Object.assign({ id: "guidance-doc:" + i }, n);
       });
-      var docs = sortItems(curatedDocs.concat(live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
+      var docs = sortItems(mergeUnique(curatedDocs, live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
       var dpg = pager(docs.length, opts.page, section);
       return (cards ? '<div class="guidance-grid">' + cards + '</div>'
           : emptyHtml("No practices match. Boring, in the best way.")) +
@@ -173,7 +192,7 @@
     }
 
     var curated = cfg.curated().map(function (n, i) { return Object.assign({ id: section + "-curated:" + i }, n); });
-    var items = sortItems(curated.concat(live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
+    var items = sortItems(mergeUnique(curated, live).filter(function (it) { return matchesQuery(it, q); }), opts.sort);
     if (!items.length) return emptyHtml("No items match. Boring, in the best way.");
     var pg = pager(items.length, opts.page, section);
     return card({ pad: "6px 24px" }, items.slice(pg.from, pg.to).map(newsItem).join('')) + pg.html;
@@ -188,7 +207,7 @@
       toolbarHtml(section, opts) +
       '<div id="intel-list">' + renderIntelList(section, opts) + '</div>' +
       '<div class="register-footnote">' + esc(cfg.foot) + ' Live material accumulates in a local running list ' +
-      'across sessions and is checked on every page load; the published site is also rebuilt daily at 6am. ' +
+      'across sessions and is checked on every page load; the published site is also rebuilt each morning (U.S. Eastern). ' +
       'Every item links to its authoritative source.</div>' +
       '</div>';
   };

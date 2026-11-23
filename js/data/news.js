@@ -8,6 +8,9 @@
 
 window.PQC_NEWS = {
   asOf: "November 22, 2026",
+  // Last curated research pass (update when ratings / intelligence are reviewed).
+  ratingsReviewed: "June 2026",
+  intelReviewed: "June 2026",
 
   /* ---- Standards & Policy — official U.S. / U.K. / EU government only ------ */
   standards: [

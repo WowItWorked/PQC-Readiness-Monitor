@@ -88,7 +88,7 @@
           : "Provider type: " + bank.type + "." });
     }
 
-    var band = bank.score >= 70 ? "Advanced" : bank.score >= 45 ? "In progress" : bank.score >= 25 ? "Early stage" : "Not evident";
+    var band = window.PQC_SCORE.band(bank.score);
     var sorted = dims.slice().sort(function (a, b) { return b.level - a.level; });
     var verdict = bank.name + "'s " + band + " rating (" + bank.score + "/100) is anchored by " +
       sorted[0].label.toLowerCase() + "; the main gap is " + sorted[sorted.length - 1].label.toLowerCase() +
@@ -122,9 +122,9 @@
     var tlsToneMap = { live: "good", partial: "mid", none: "bad", unknown: "na" };
     var pqcToneMap = { shipping: "good", roadmap: "mid", research: "warn", none: "na" };
     var sig = bank.signals || {};
-    var roadmap = sig.roadmap || (isVendor
+    var roadmap = String(sig.roadmap || (isVendor
       ? ({ shipping: "PQC shipping in products", roadmap: "Public migration plan", research: "Research signals only", none: "None public" })[bank.pqc]
-      : "None public");
+      : "None public") || "None public");
     var standards = (sig.standards && sig.standards.length) ? sig.standards.join(" · ")
       : isVendor ? (bank.conf === "Documented" ? "Active in NIST / IETF / sector working groups" : "—")
       : (bank.conf === "Estimated" ? "FS-ISAC membership typical for this tier" : "—");
@@ -134,8 +134,8 @@
       : roadmap.indexOf("signals") !== -1 || roadmap.indexOf("Parent") !== -1 || roadmap.indexOf("Internal") !== -1 ? "mid" : "na";
 
     var firstTile = isVendor
-      ? signalTile(PQC_META[bank.pqc].icon, "Product PQC", PQC_META[bank.pqc].label, pqcToneMap[bank.pqc])
-      : signalTile(TLS_META[bank.tls].icon, "Website TLS",
+      ? signalTile((PQC_META[bank.pqc] || PQC_META.none).icon, "Product PQC", (PQC_META[bank.pqc] || PQC_META.none).label, pqcToneMap[bank.pqc])
+      : signalTile((TLS_META[bank.tls] || TLS_META.unknown).icon, "Website TLS",
           bank.tls === "live" ? "Hybrid ML-KEM key exchange live"
           : bank.tls === "partial" ? "Hybrid-capable edge; not yet site-wide"
           : bank.tls === "none" ? "Classical key exchange only" : "Not assessed in this snapshot",
@@ -176,12 +176,12 @@
       : "Representative assessment pending a live TLS scan and research pass. Treat as a placeholder, not a finding.";
 
     return '<div class="drawer-overlay" data-action="close-drawer">' +
-      '<div class="drawer-panel" data-stop>' +
+      '<div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">' +
       '<div class="drawer-head">' +
       '<div class="drawer-head-main">' +
       '<div class="drawer-chips"><span class="drawer-rank">#' + String(bank.rank).padStart(2, "0") + '</span>' +
       readinessBadge(bank.status) + confChip(bank.conf) + '</div>' +
-      '<h2 class="drawer-name">' + esc(bank.name) + '</h2>' +
+      '<h2 class="drawer-name" id="drawer-title">' + esc(bank.name) + '</h2>' +
       '<div class="drawer-sub">' + esc(bank.domain) + ' · ' + esc(bank.hq) + '</div>' +
       '</div>' +
       '<div class="drawer-scorebox">' +
@@ -207,15 +207,34 @@
 
   var root = null;
 
+  var returnFocus = null;
+
   window.openDrawer = function (bank) {
     root = root || document.getElementById("drawer-root");
+    if (!root.innerHTML) returnFocus = document.activeElement;
     root.innerHTML = drawerHtml(bank);
+    var close = root.querySelector(".drawer-close");
+    if (close) close.focus();
   };
 
   window.closeDrawer = function () {
     root = root || document.getElementById("drawer-root");
     root.innerHTML = "";
+    // Return focus to the row that opened the drawer (if it still exists).
+    if (returnFocus && document.contains(returnFocus)) returnFocus.focus();
+    returnFocus = null;
   };
+
+  // Keep Tab cycling inside the open drawer.
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !root || !root.innerHTML) return;
+    var f = root.querySelectorAll('a[href], button, [tabindex="0"]');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    else if (!root.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  });
 
   window.isDrawerOpen = function () {
     root = root || document.getElementById("drawer-root");

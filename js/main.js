@@ -7,12 +7,12 @@
     var defaults = { density: "comfortable", scoreStyle: "bar", showConfidence: true };
     try {
       var saved = JSON.parse(localStorage.getItem(PREFS_KEY));
-      return Object.assign(defaults, saved || {});
+      return Object.assign(defaults, saved && typeof saved === "object" ? saved : {});
     } catch (e) { return defaults; }
   }
 
   var state = {
-    active: "overview",
+    active: "home",
     query: "",
     statusFilter: "All",
     instCat: "All",
@@ -41,6 +41,8 @@
   }
   function detectDevice() {
     state.isMobile = computeIsMobile();
+    var search = document.getElementById("global-search");
+    if (search) search.placeholder = state.isMobile ? "Search…" : "Search institutions…";
     var app = document.querySelector(".app");
     if (app) {
       app.classList.toggle("is-mobile", state.isMobile);
@@ -49,7 +51,8 @@
   }
 
   var VIEWS = {
-    overview:     { title: "PQC Readiness Overview", crumb: "Monitor" },
+    home:         { title: "PQC Readiness Monitor", crumb: "" },
+    overview:     { title: "Dashboard", crumb: "Monitor" },
     institutions: { title: "Top 100 Institutions", crumb: "Monitor" },
     vendors:      { title: "Top 100 Third Parties", crumb: "Monitor" },
     standards:    { title: "Standards & Policy", crumb: "Intelligence" },
@@ -62,7 +65,7 @@
 
   var NAV_GROUPS = [
     { label: "Monitor", items: [
-      ["overview", "Overview", "layout-dashboard"],
+      ["overview", "Dashboard", "layout-dashboard"],
       ["institutions", "Institutions", "landmark"],
       ["vendors", "Third Parties", "boxes"],
       ["trends", "Readiness Trends", "trending-up"],
@@ -84,7 +87,8 @@
       return '<div class="nav-group"><div class="nav-group-label">' + esc(g.label) + '</div>' +
         g.items.map(function (it) {
           var on = state.active === it[0];
-          return '<a class="nav-item' + (on ? ' active' : '') + '" data-view="' + it[0] + '">' +
+          return '<a class="nav-item' + (on ? ' active' : '') + '" href="#' + it[0] + '" data-view="' + it[0] + '"' +
+            (on ? ' aria-current="page"' : '') + '>' +
             icon(it[2], 18) + esc(it[1]) + '</a>';
         }).join('') + '</div>';
     }).join('');
@@ -93,31 +97,50 @@
   function shellHtml() {
     return '<div class="app">' +
       '<aside class="sidebar">' +
-      '<div class="sidebar-head"><span class="logo">' +
-      '<span class="logo-roundel"><span></span></span>' +
-      '<span class="logo-text"><span>Financial Sector</span><span>PQC Readiness</span></span>' +
-      '</span></div>' +
+      '<div class="sidebar-head"><a class="logo" href="#" data-view="home" title="Front page">' + logoMark() +
+      '<span class="logo-text"><span class="logo-kicker">Emerging Tech Risk</span><span>Financial Sector</span><span>PQC Readiness</span></span>' +
+      '</a></div>' +
       '<nav class="sidebar-nav" id="nav"></nav>' +
-      '<div class="sidebar-foot">Snapshot compiled ' + esc(window.PQC_NEWS.asOf) +
-      '. Assessments from public signals — see Methodology.</div>' +
+      '<div class="sidebar-foot">Ratings reviewed ' + esc(pqcFreshness().ratings) + ' · TLS scanned ' +
+      esc(pqcFreshness().tls) + '. Assessments from public signals — see Methodology.</div>' +
       '</aside>' +
       '<div class="main-col">' +
       '<header class="topbar">' +
-      '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu">' + icon("menu", 20) + '</button>' +
+      '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu" aria-expanded="false">' + icon("menu", 20) + '</button>' +
       '<div class="topbar-titles"><div class="topbar-crumb" id="crumb"></div>' +
       '<div class="topbar-title" id="title"></div></div>' +
-      '<span class="asof-chip">' + icon("calendar", 14, "var(--fg-3)") + 'Data as of ' + esc(window.PQC_NEWS.asOf) + '</span>' +
+      '<span class="asof-chip" title="Firm ratings are curated; the website TLS scan runs daily.">' + icon("calendar", 14, "var(--fg-3)") +
+      'Ratings ' + esc(pqcFreshness().ratings) + ' · TLS scan ' + esc(pqcFreshness().tls) + '</span>' +
       '<div class="search-wrap">' + icon("search", 17) +
-      '<input class="search-input" id="global-search" placeholder="Search institutions…"></div>' +
+      '<input class="search-input" id="global-search" type="search" aria-label="Search institutions and third parties" placeholder="Search institutions…"></div>' +
       '</header>' +
-      '<div role="note" style="display:flex; align-items:flex-start; gap:10px; padding:10px 28px; background:var(--warning-bg); border-bottom:1px solid var(--warning-line); flex:none;">' +
-      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.73-2Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>' +
-      '<div style="font-size:12.5px; line-height:1.5; color:var(--fg-1);"><b style="color:var(--warning); font-weight:700;">Prototype &mdash; for demonstration purposes only.</b> This dashboard and the information it contains were developed as part of a prototype/demonstration. Content has not been fully vetted and should not be relied upon for decision-making purposes.</div>' +
-      '</div>' +
+      prototypeBanner() +
       '<main class="main-scroll" id="main"></main>' +
       '</div>' +
       '<div class="nav-backdrop" data-action="close-nav"></div>' +
       '</div>';
+  }
+
+  // Two layouts: the front page (top bar, no sidebar) and the dashboard shell.
+  var mounted = null;
+  function mount() {
+    var mode = state.active === "home" ? "home" : "app";
+    var root = document.getElementById("app");
+    if (mode === "home") {
+      root.innerHTML = renderLanding(window.INSTITUTIONS);
+      mounted = "home";
+      document.title = "PQC Readiness Monitor — Emerging Tech Risk";
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (mounted !== "app") {
+      root.innerHTML = shellHtml();
+      mounted = "app";
+      detectDevice();
+    }
+    document.title = VIEWS[state.active].title + " — PQC Readiness Monitor";
+    renderChrome();
+    renderMain();
   }
 
   function renderChrome() {
@@ -130,6 +153,7 @@
   }
 
   function renderMain() {
+    if (mounted !== "app") return;
     var main = document.getElementById("main");
     var data = window.INSTITUTIONS;
     var vendorData = window.VENDORS;
@@ -156,14 +180,21 @@
   function setNav(open) {
     var app = document.querySelector(".app");
     if (app) app.classList.toggle("nav-open", open);
+    var t = document.querySelector(".nav-toggle");
+    if (t) t.setAttribute("aria-expanded", open ? "true" : "false");
   }
 
   function navigate(view) {
+    if (!VIEWS[view]) view = "home";
     state.active = view;
+    // Mirror the view in the URL so views are linkable and Back works.
+    var hash = view === "home" ? "" : "#" + view;
+    if (location.hash !== hash) {
+      history.pushState(null, "", hash || location.pathname + location.search);
+    }
     state.viewoptsOpen = false;
     setNav(false); // close the mobile menu after choosing a destination
-    renderChrome();
-    renderMain();
+    mount();
   }
 
   function savePrefs() {
@@ -180,13 +211,16 @@
   /* ---- Events ------------------------------------------------------------- */
   document.addEventListener("click", function (e) {
     var nav = e.target.closest("[data-view]");
-    if (nav) { navigate(nav.getAttribute("data-view")); return; }
+    if (nav) { e.preventDefault(); navigate(nav.getAttribute("data-view")); return; }
 
     var el = e.target.closest("[data-action]");
     if (!el) return;
     var action = el.getAttribute("data-action");
 
     switch (action) {
+      case "dismiss-banner":
+        dismissBanner();
+        break;
       case "toggle-nav":
         setNav(!document.querySelector(".app").classList.contains("nav-open"));
         break;
@@ -288,7 +322,12 @@
   }, true);
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && isDrawerOpen()) closeDrawer();
+    if (e.key === "Escape" && isDrawerOpen()) { closeDrawer(); return; }
+    // Rows and cards that act as buttons respond to Enter / Space like buttons.
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('[tabindex="0"][data-action]')) {
+      e.preventDefault();
+      e.target.click();
+    }
   });
 
   // Live filtering as the reader types in a feed's search box.
@@ -325,10 +364,16 @@
   }
 
   /* ---- Boot ---------------------------------------------------------------- */
-  document.getElementById("app").innerHTML = shellHtml();
-  detectDevice();
-  renderChrome();
-  renderMain();
+  var initial = location.hash.slice(1);
+  if (VIEWS[initial]) state.active = initial;
+  window.addEventListener("popstate", function () {
+    var v = location.hash.slice(1);
+    state.active = VIEWS[v] ? v : "home";
+    state.viewoptsOpen = false;
+    setNav(false);
+    mount();
+  });
+  mount();
 
   // Re-evaluate the device class on viewport/orientation change and re-render
   // when crossing the desktop/mobile boundary so the layout swaps cleanly.
@@ -353,7 +398,10 @@
   // Check every intelligence section's trusted live sources on page load.
   refreshAllFeeds(updateIntelView);
 
-  document.getElementById("global-search").addEventListener("input", function (e) {
+  // Delegated: the dashboard shell (and its search box) is rebuilt when
+  // returning from the front page.
+  document.addEventListener("input", function (e) {
+    if (e.target.id !== "global-search") return;
     state.query = e.target.value;
     if (state.query && state.active !== "institutions" && state.active !== "vendors") {
       navigate("institutions");

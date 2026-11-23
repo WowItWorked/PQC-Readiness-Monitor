@@ -71,10 +71,11 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         continue-on-error: true  # never let a flaky scan block the daily refresh
         run: |
-          node scripts/gen-domains.mjs "$GITHUB_WORKSPACE/domains.json"
-          ( cd scanner && go run . "$GITHUB_WORKSPACE/domains.json" "$GITHUB_WORKSPACE/results.json" )
-          node scripts/build-tls-scan.mjs "$GITHUB_WORKSPACE/results.json"
-          rm -f "$GITHUB_WORKSPACE/domains.json" "$GITHUB_WORKSPACE/results.json"
+          # Scratch files live outside the checkout so a failed scan can never
+          # leave them behind to be committed.
+          node scripts/gen-domains.mjs "$RUNNER_TEMP/domains.json"
+          ( cd scanner && go run . "$RUNNER_TEMP/domains.json" "$RUNNER_TEMP/results.json" )
+          node scripts/build-tls-scan.mjs "$RUNNER_TEMP/results.json"
 
       - name: Record daily snapshot and update date
         if: steps.guard.outputs.skip != 'true'
@@ -90,9 +91,13 @@ jobs:
           else
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
+            git add js/data
             git commit -m "Daily snapshot: $TODAY"
-            git push
+            # Rebase onto anything pushed since checkout so the day's snapshot isn't lost.
+            for i in 1 2 3; do
+              git pull --rebase --quiet && git push && break
+              echo "Push attempt $i failed; retrying…"; sleep $((i * 5))
+            done
           fi
 
       - name: Request a GitHub Pages build

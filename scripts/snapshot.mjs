@@ -22,21 +22,25 @@ const vend = loadWindow("js/data/vendors.js").VENDORS || [];
 // Apply the same live-TLS overlay the browser uses, so recorded history matches
 // the displayed (scan-adjusted) scores exactly.
 try {
-  const adjust = (loadWindow("js/data/score-model.js").PQC_SCORE || {}).adjust;
+  const model = loadWindow("js/data/score-model.js").PQC_SCORE;
   const tls = fs.existsSync("js/data/tls-scan.js") ? (loadWindow("js/data/tls-scan.js").PQC_TLS || {}) : {};
   const scan = tls.results || {};
-  if (adjust) {
-    inst.forEach((b) => {
-      const obs = scan[b.domain];
-      if (obs && obs !== "unknown") { b.score = adjust(b.score, b.tls, obs); b.tls = obs; }
-    });
-  }
+  if (model) inst.forEach((b) => model.applyScan(b, scan[b.domain]));
 } catch (e) { /* no scan yet — record baseline scores */ }
 
 const histPath = "js/data/history.js";
 let hist = { dates: [], inst: {}, vendor: {} };
 if (fs.existsSync(histPath)) {
-  try { hist = loadWindow(histPath).PQC_HISTORY || hist; } catch (e) { /* start fresh */ }
+  // Never silently replace an unreadable history (bad merge, truncated write):
+  // that would commit a one-day file and erase every prior snapshot.
+  try { hist = loadWindow(histPath).PQC_HISTORY; } catch (e) {
+    console.error(`Refusing to overwrite unreadable ${histPath}: ${e.message}`);
+    process.exit(1);
+  }
+  if (!hist || !Array.isArray(hist.dates)) {
+    console.error(`${histPath} has no PQC_HISTORY.dates — refusing to overwrite.`);
+    process.exit(1);
+  }
 }
 
 const today = new Date().toISOString().slice(0, 10);

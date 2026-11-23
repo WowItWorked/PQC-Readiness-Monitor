@@ -56,10 +56,14 @@ func classifyHost(host string) string {
 
 func classify(domain string) string {
 	r := classifyHost(domain)
-	if r == "unknown" { // many sites serve only on www.
-		if w := classifyHost("www." + domain); w != "unknown" {
-			return w
-		}
+	if r == "live" {
+		return r
+	}
+	// Many sites serve only on www., and some apexes are a classical redirect
+	// while www. (the real site) negotiates hybrid PQC — so check www. unless
+	// the apex is already live, and keep the stronger of the two results.
+	if w := classifyHost("www." + domain); w == "live" || r == "unknown" {
+		return w
 	}
 	return r
 }
