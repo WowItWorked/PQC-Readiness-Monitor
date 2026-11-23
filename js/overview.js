@@ -20,9 +20,9 @@
         '<div class="dist-track"><div class="dist-fill" style="width:' + (n / total) * 100 + '%;background:' + m.c + '"></div></div>' +
         '<span class="dist-count">' + n + '</span></div>';
     }).join('');
-    return card({ title: "Readiness distribution", sub: total + " institutions · status of public quantum-safe signals" },
+    return card({ title: "Where institutions stand", sub: total + " institutions · rated on public evidence of preparation" },
       '<div style="display:grid;gap:14px">' + rows + '</div>' +
-      '<div class="card-footnote">Click a row to filter the institutions register.</div>');
+      '<div class="card-footnote">Select a row to see those institutions.</div>');
   }
 
   /* ---- Readiness by size tier (stacked bars) ----------------------------- */
@@ -49,7 +49,7 @@
     var legend = STATUS_ORDER.map(function (st) {
       return '<span class="legend-item"><span class="legend-swatch" style="background:' + READINESS[st].c + '"></span>' + esc(st) + '</span>';
     }).join('');
-    return card({ title: "Readiness by institution size", sub: "Total assets, approximate · share of each tier by status" },
+    return card({ title: "Readiness by institution size", sub: "Grouped by total assets · share of each group by rating" },
       '<div style="display:grid;gap:14px">' + rows + '</div>' +
       '<div class="legend">' + legend + '</div>');
   }
@@ -63,13 +63,13 @@
     var now = d.getFullYear() + (d.getMonth() + d.getDate() / 31) / 12;
     var crqcStart = 2030;
     var marks = [
-      { y: 2024.62, lane: "t2", anchor: "start", label: "FIPS 203/204/205 final", sub: "NIST · Aug 2024" },
-      { y: 2025.4,  lane: "b2", label: "Google: 1M qubits breaks RSA-2048", sub: "Quantum AI research · May 2025" },
-      { y: 2026.04, lane: "t1", label: "G7 sector roadmap", sub: "Treasury + BoE · Jan 2026" },
-      { y: 2029,    lane: "b1", label: "Google &amp; Cloudflare PQC complete", sub: "Self-imposed 2029 targets" },
-      { y: 2030,    lane: "t2", label: "RSA / ECC deprecated", sub: "NIST IR 8547 · EU critical infra" },
-      { y: 2032,    lane: "b2", label: "Critical systems migrated", sub: "G7 CEG target" },
-      { y: 2035,    lane: "t1", label: "RSA / ECC disallowed", sub: "NIST · federal QR target" },
+      { y: 2024.62, lane: "t2", anchor: "start", label: "First quantum-safe standards", sub: "NIST · Aug 2024" },
+      { y: 2025.4,  lane: "b2", label: "Research: encryption easier to break", sub: "Google · May 2025" },
+      { y: 2026.04, lane: "t1", label: "G7 financial-sector roadmap", sub: "UK Treasury · Jan 2026" },
+      { y: 2029,    lane: "b1", label: "Google &amp; Cloudflare targets", sub: "Own 2029 upgrade deadlines" },
+      { y: 2030,    lane: "t2", label: "Retirement of today\u2019s encryption begins", sub: "NIST · EU critical infra" },
+      { y: 2032,    lane: "b2", label: "Critical financial systems upgraded", sub: "G7 target" },
+      { y: 2035,    lane: "t1", label: "Today\u2019s encryption no longer allowed", sub: "NIST · U.S. federal target" },
     ];
     // Four label lanes around the axis so neighbours never collide:
     // t2 (high) · t1 (near, 2-line budget) · AXIS · b1 (near) · b2 (low)
@@ -110,7 +110,7 @@
       'border-radius:0 var(--radius-sm) var(--radius-sm) 0"></div>' +
       '<div style="position:absolute;top:' + (H - 18) + 'px;right:6px;font-size:11px;font-weight:700;' +
       'letter-spacing:0.05em;text-transform:uppercase;color:var(--warning);white-space:nowrap;text-align:right">' +
-      'Projected CRQC window — estimates cluster 2030+</div>' +
+      'When a code-breaking quantum computer may arrive — most estimates 2030+</div>' +
       // axis
       '<div style="position:absolute;top:' + AXIS + 'px;left:0;right:0;height:4px;background:var(--gray-100);border-radius:2px"></div>' +
       '<div style="position:absolute;top:' + AXIS + 'px;left:0;width:' + pos(now) + ';height:4px;background:var(--brand-blue);border-radius:2px"></div>' +
@@ -125,14 +125,14 @@
         return '<span>' + y + '</span>';
       }).join('') + '</div>' +
       '</div></div>' +
-      '<div class="tl-footnote">Google Quantum AI research (May 2025) cut the estimated cost of breaking RSA-2048 ' +
-      'twenty-fold — to under one million noisy qubits running for about a week. As of 2025, expert surveys put 10-year ' +
-      'CRQC probability at 28–49%, the highest recorded. Google responded by committing to complete its own PQC ' +
-      'migration by 2029.</div>';
+      '<div class="tl-footnote">Why the urgency: in 2025, Google researchers estimated that the encryption most ' +
+      'organizations rely on could be broken with far less quantum computing power than previously thought. Expert ' +
+      'surveys in 2025 put the chance of such a machine within ten years at roughly 28&ndash;49%. Information stolen ' +
+      'today can be stored and decrypted later, so long-lived sensitive data is already at risk.</div>';
 
     return card({
-      title: "Migration deadline timeline",
-      sub: "Standards, policy, and industry projections — after its 2025 resource estimate, Google set itself a 2029 migration deadline",
+      title: "Key deadlines",
+      sub: "Key standards, policy deadlines, and industry targets for upgrading to quantum-safe encryption",
     }, inner);
   }
 
@@ -191,34 +191,34 @@
     var scanned = data.filter(function (b) { return b.tlsObserved; }).length;
     var estimated = data.filter(function (b) { return b.conf === "Estimated"; }).length;
     var tlsEvidence = '<span class="ev-text">' + (observed === liveList.length
-      ? (liveList.length ? "All " + observed : "None") + " observed by the daily TLS handshake scan"
-      : observed + " observed by scan · " + (liveList.length - observed) + " assumed") +
-      (scanned ? " (" + scanned + " sites scanned)" : "") + '</span>';
+      ? (liveList.length ? "All " + observed : "None") + " confirmed by our daily automated website check"
+      : observed + " confirmed by our daily check · " + (liveList.length - observed) + " assumed") +
+      (scanned ? " (" + scanned + " websites checked)" : "") + '</span>';
     var years = Math.max(0, (DEPRECATION - new Date()) / (365.25 * 864e5));
     return '<section class="hero" aria-labelledby="hero-title">' + latticeSvg() +
       '<div class="hero-inner">' +
-      '<div class="hero-eyebrow">Post-quantum cryptography &middot; U.S. financial sector</div>' +
-      '<h1 class="hero-title" id="hero-title">Tracking the financial sector&rsquo;s race to quantum-safe encryption</h1>' +
-      '<p class="hero-lead">The RSA and elliptic-curve cryptography that protects payments, accounts, and ' +
-      'market infrastructure will not survive a cryptographically relevant quantum computer &mdash; and data ' +
-      'harvested today can be decrypted later. This monitor tracks public evidence of post-quantum migration across ' +
-      'the ' + data.length + ' largest U.S. financial institutions and the ' + vendors.length +
-      ' third parties they depend on. Website encryption is scanned daily; firm ratings are refreshed on each research pass.</p>' +
+      '<div class="hero-eyebrow">Post-quantum readiness &middot; U.S. financial sector</div>' +
+      '<h1 class="hero-title" id="hero-title">A transparent view of how financial institutions and their providers are preparing for quantum-safe security</h1>' +
+      '<p class="hero-lead">Future quantum computers are expected to break the encryption that protects today&rsquo;s ' +
+      'payments, accounts, and records. Every financial institution &mdash; and every provider it relies on &mdash; will ' +
+      'need to upgrade. This monitor brings together the public evidence of that preparation for the ' + data.length +
+      ' largest U.S. financial institutions and ' + vendors.length + ' key third-party providers, and shows how strong ' +
+      'that evidence is, so leaders can see where the sector stands and ask better questions.</p>' +
       '<div class="hero-ctas">' +
       '<a class="hero-btn primary" href="#overview" data-view="overview">Open the dashboard ' + icon("arrow-right", 16) + '</a>' +
       '<a class="hero-btn" href="#institutions" data-view="institutions">Explore institutions</a>' +
-      '<a class="hero-link" href="#methodology" data-view="methodology">How readiness is scored</a>' +
+      '<a class="hero-link" href="#methodology" data-view="methodology">How we rate organizations</a>' +
       '</div>' +
       '<div class="hero-stats">' +
-      heroStat(activeList.length + '<span>/' + data.length + '</span>', "Institutions with active programs", evidenceMix(activeList)) +
-      heroStat(shippingList.length + '<span>/' + vendors.length + '</span>', "Third parties shipping PQC", evidenceMix(shippingList)) +
-      heroStat(String(liveList.length), "Bank websites on hybrid TLS", tlsEvidence) +
-      heroStat(years.toFixed(1) + '<span> yrs</span>', "Until RSA/ECC deprecation",
-        '<span class="ev-text">Published guidance · NIST IR 8547, after 2030</span>') +
+      heroStat(activeList.length + '<span>/' + data.length + '</span>', "Institutions showing active preparation", evidenceMix(activeList)) +
+      heroStat(shippingList.length + '<span>/' + vendors.length + '</span>', "Key providers offering quantum-safe products", evidenceMix(shippingList)) +
+      heroStat(String(liveList.length), "Bank websites already using quantum-safe encryption", tlsEvidence) +
+      heroStat(years.toFixed(1) + '<span> yrs</span>', "Until U.S. standards begin retiring today\u2019s encryption",
+        '<span class="ev-text">NIST guidance: phase-out begins after 2030</span>') +
       '</div>' +
       (estimated ? '<p class="hero-caveat">' + icon("info", 15) + '<span><strong>' + estimated + ' of ' + data.length +
-        ' institution ratings are still placeholder estimates</strong> awaiting a research pass, so treat ' +
-        'program counts as indicative. Scan results and documented ratings are the firmest signals. ' +
+        ' institution ratings are still placeholder estimates</strong> until we research them in detail, so treat ' +
+        'these counts as a guide, not a verdict. The website checks and publicly documented ratings are the most reliable figures. ' +
         '<a href="#methodology" data-view="methodology">How ratings are evidenced</a></span></p>' : '') +
       '</div></section>';
   }
@@ -239,9 +239,9 @@
     var exposed = data.filter(function (b) { return b.assets >= 100; })
       .sort(function (a, b) { return a.score - b.score; }).slice(0, 5);
     return '<div class="movers-grid">' +
-      card({ title: "Furthest along", sub: "Highest readiness scores in the cohort" },
+      card({ title: "Furthest along", sub: "Institutions with the strongest public evidence of preparation" },
         '<div style="display:grid">' + moverList(leaders, "var(--success)") + '</div>') +
-      card({ title: "Watch list", sub: "Largest institutions ($100B+) with the weakest public signals" },
+      card({ title: "Watch list", sub: "Large institutions ($100B+ in assets) with the least public evidence of preparation" },
         '<div style="display:grid">' + moverList(exposed, "var(--danger)") + '</div>') +
       '</div>';
   }
@@ -275,10 +275,10 @@
     var median = !sorted.length ? "—" : sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
     return '<div class="overview">' +
       '<div class="kpi-grid">' +
-      kpiCard("activity", "Active programs", activeList.length + " / " + data.length,
+      kpiCard("activity", "Showing active preparation", activeList.length + " / " + data.length,
         conf.Documented + " documented · " + conf.Inferred + " inferred · " + conf.Estimated + " estimated") +
-      kpiCard("shield-check", "Hybrid TLS live", live, "observed by the daily website scan") +
-      kpiCard("gauge", "Median readiness", String(median), "of 100 across " + data.length + " institutions") +
+      kpiCard("shield-check", "Quantum-safe websites", live, "confirmed by our daily website check") +
+      kpiCard("gauge", "Typical score", String(median), "median of 100, across " + data.length + " institutions") +
       kpiCard("trending-up", "30-day change", trend30(), "in the institutions' average score") +
       '</div>' +
       '<div class="dist-grid">' + distribution(data) + sizeTiers(data) + '</div>' +
