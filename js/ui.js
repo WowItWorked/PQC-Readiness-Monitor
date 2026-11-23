@@ -161,7 +161,47 @@
     return v.note || pqcTxt;
   }
 
+  function logoMark() {
+    return '<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">' +
+      '<path d="M16 2 28.1 9v14L16 30 3.9 23V9Z" fill="var(--brand-accent)"/>' +
+      '<g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.9">' +
+      '<path d="M10 12.5h12M8.5 19.5h15M10 12.5l-1.5 7M16 12.5l-1.5 7M22 12.5l1.5 7"/></g>' +
+      '<g fill="#fff"><circle cx="10" cy="12.5" r="1.9"/><circle cx="16" cy="12.5" r="1.9"/><circle cx="22" cy="12.5" r="1.9"/>' +
+      '<circle cx="8.5" cy="19.5" r="1.9"/><circle cx="14.5" cy="19.5" r="1.9"/><circle cx="23.5" cy="19.5" r="1.9"/></g></svg>';
+  }
+
+  // How current each input is. The TLS scan runs daily; curated ratings and the
+  // standards/guidance baseline change only on a research pass — never conflate them.
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function fmtIso(d) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || "");
+    return m ? MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1] : "";
+  }
+  function pqcFreshness() {
+    var n = window.PQC_NEWS || {};
+    return {
+      tls: fmtIso((window.PQC_TLS || {}).scannedAt) || n.asOf || "—",
+      ratings: n.ratingsReviewed || "—",
+      intel: n.intelReviewed || "—",
+    };
+  }
+
+  var BANNER_KEY = "pqc-banner-dismissed";
+  function bannerDismissed() { try { return localStorage.getItem(BANNER_KEY) === "1"; } catch (e) { return false; } }
+  function prototypeBanner() {
+    if (bannerDismissed()) return '';
+    return '<div class="proto-banner" role="note">' + icon("info", 15) +
+      '<span><b>Prototype for demonstration.</b> Content has not been fully vetted and should not be relied on for decisions.</span>' +
+      '<button class="proto-dismiss" data-action="dismiss-banner" aria-label="Dismiss notice">' + icon("x", 15) + '</button></div>';
+  }
+  function dismissBanner() {
+    try { localStorage.setItem(BANNER_KEY, "1"); } catch (e) { /* private mode */ }
+    document.querySelectorAll(".proto-banner").forEach(function (el) { el.remove(); });
+  }
+
   Object.assign(window, {
+    logoMark: logoMark, pqcFreshness: pqcFreshness, fmtIso: fmtIso,
+    prototypeBanner: prototypeBanner, dismissBanner: dismissBanner,
     esc: esc, READINESS: READINESS, STATUS_ORDER: STATUS_ORDER,
     readinessBadge: readinessBadge, TLS_META: TLS_META, tlsChip: tlsChip,
     PQC_META: PQC_META, pqcChip: pqcChip, confChip: confChip,

@@ -203,10 +203,10 @@
       'market infrastructure will not survive a cryptographically relevant quantum computer &mdash; and data ' +
       'harvested today can be decrypted later. This monitor tracks public evidence of post-quantum migration across ' +
       'the ' + data.length + ' largest U.S. financial institutions and the ' + vendors.length +
-      ' third parties they depend on, refreshed daily.</p>' +
+      ' third parties they depend on. Website encryption is scanned daily; firm ratings are refreshed on each research pass.</p>' +
       '<div class="hero-ctas">' +
-      '<a class="hero-btn primary" href="#institutions" data-view="institutions">Explore institutions ' + icon("arrow-right", 16) + '</a>' +
-      '<a class="hero-btn" href="#vendors" data-view="vendors">Third-party providers</a>' +
+      '<a class="hero-btn primary" href="#overview" data-view="overview">Open the dashboard ' + icon("arrow-right", 16) + '</a>' +
+      '<a class="hero-btn" href="#institutions" data-view="institutions">Explore institutions</a>' +
       '<a class="hero-link" href="#methodology" data-view="methodology">How readiness is scored</a>' +
       '</div>' +
       '<div class="hero-stats">' +
@@ -262,18 +262,24 @@
     return (d > 0 ? "+" : d < 0 ? "−" : "±") + Math.abs(d).toFixed(1);
   }
 
+  window.renderHero = hero;
+  window.renderTimeline = timeline;
+
   window.renderOverview = function (data) {
-    var notEvident = data.filter(function (b) { return b.status === "Not evident"; }).length;
-    var documented = data.filter(function (b) { return b.conf === "Documented"; }).length;
+    var activeList = data.filter(function (b) { return b.status === "Advanced" || b.status === "In progress"; });
+    var conf = { Documented: 0, Inferred: 0, Estimated: 0 };
+    activeList.forEach(function (b) { if (conf[b.conf] != null) conf[b.conf]++; });
+    var live = data.filter(function (b) { return b.tls === "live"; }).length;
     var sorted = data.map(function (b) { return b.score; }).sort(function (a, b) { return a - b; });
     var mid = Math.floor(sorted.length / 2);
     var median = !sorted.length ? "—" : sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-    return hero(data) + '<div class="overview">' +
+    return '<div class="overview">' +
       '<div class="kpi-grid">' +
+      kpiCard("activity", "Active programs", activeList.length + " / " + data.length,
+        conf.Documented + " documented · " + conf.Inferred + " inferred · " + conf.Estimated + " estimated") +
+      kpiCard("shield-check", "Hybrid TLS live", live, "observed by the daily website scan") +
       kpiCard("gauge", "Median readiness", String(median), "of 100 across " + data.length + " institutions") +
-      kpiCard("activity", "30-day change", trend30(), "in the institutions' average score") +
-      kpiCard("shield-x", "No public signals", notEvident, "institutions rated Not evident") +
-      kpiCard("shield-check", "Documented evidence", documented, "ratings backed by direct public disclosure") +
+      kpiCard("trending-up", "30-day change", trend30(), "in the institutions' average score") +
       '</div>' +
       '<div class="dist-grid">' + distribution(data) + sizeTiers(data) + '</div>' +
       timeline() +
