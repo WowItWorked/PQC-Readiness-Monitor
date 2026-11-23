@@ -76,7 +76,7 @@ offline — the curated, fully-linked snapshot still renders.
 ## Daily auto-refresh
 
 A scheduled GitHub Action ([`.github/workflows/daily-refresh.yml`](.github/workflows/daily-refresh.yml))
-runs every day at **6:00 AM US Eastern** (10:00 UTC): it advances the "Data as
+runs every day at **10:19 UTC** (about 6:19 AM EDT / 5:19 AM EST), with a 14:19 UTC safety-net run: it advances the "Data as
 of" date, commits, and requests a fresh GitHub Pages build so the published site
 never goes stale. (Visitors also get live data on every page load.) GitHub cron
 is UTC and ignores daylight saving — edit the `cron:` line to change the time or

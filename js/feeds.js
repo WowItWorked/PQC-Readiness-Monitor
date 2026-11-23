@@ -203,7 +203,6 @@
 
   /* ---- Section → source registry ----------------------------------------------- */
   var PQC_GUARD = /post.?quantum|quantum.?safe|quantum.?resistant|quantum.?resilien|\bpqc\b|ml-kem|ml-dsa|slh-dsa|kyber|dilithium|lattice-based/i;
-  var FIN_GUARD = /financ|bank|payment|insur|trading|market|swift|settle|ledger|custod/i;
 
   var FIN_AGENCIES = ["comptroller-of-the-currency", "federal-reserve-system", "treasury-department",
     "securities-and-exchange-commission", "federal-deposit-insurance-corporation",
@@ -264,8 +263,15 @@
   var FEEDS = window.FEEDS = {};
 
   function loadStore(key) {
-    try { return JSON.parse(localStorage.getItem(key)) || { items: [] }; }
-    catch (e) { return { items: [] }; }
+    // Tolerate old or tampered entries: keep only well-formed items with http(s) links.
+    try {
+      var s = JSON.parse(localStorage.getItem(key));
+      if (!s || typeof s !== "object" || !Array.isArray(s.items)) return { items: [] };
+      s.items = s.items.filter(function (it) {
+        return it && typeof it === "object" && (!it.url || /^https?:\/\//i.test(it.url));
+      });
+      return s;
+    } catch (e) { return { items: [] }; }
   }
   function saveStore(key, s) {
     try { localStorage.setItem(key, JSON.stringify(s)); } catch (e) { /* private mode */ }

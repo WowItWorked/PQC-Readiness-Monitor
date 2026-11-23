@@ -44,7 +44,7 @@
     return '<span class="reg-card-score" style="background:' + scoreColor(score) + '">' + score + '</span>';
   }
   function regCard(action, item, lines, chips) {
-    return '<div class="reg-card" data-action="' + action + '" data-name="' + esc(item.name) + '">' +
+    return '<div class="reg-card" tabindex="0" role="button" data-action="' + action + '" data-name="' + esc(item.name) + '">' +
       '<div class="reg-card-top">' +
       '<span class="reg-card-rank">' + String(item.rank).padStart(2, "0") + '</span>' +
       '<span class="reg-card-name">' + esc(item.name) + '</span>' +
@@ -72,7 +72,7 @@
     }).join('');
 
     var body = rows.map(function (b) {
-      return '<tr data-action="open-inst" data-name="' + esc(b.name) + '">' +
+      return '<tr tabindex="0" data-action="open-inst" data-name="' + esc(b.name) + '">' +
         '<td class="cell-rank">' + String(b.rank).padStart(2, "0") + '</td>' +
         '<td><div class="cell-name">' + esc(b.name) + '</div>' +
         (!compact ? '<div class="cell-meta">' + esc(b.domain) + ' · ' + esc(b.hq) + '</div>' : '') + '</td>' +
@@ -112,7 +112,7 @@
     return '<div class="register">' +
       '<div class="register-toolbar">' + statusPills(opts.statusFilter, "inst-status") +
       '<span class="spacer"></span>' +
-      '<select class="select-ctl" data-action="inst-cat">' + catOptions + '</select>' +
+      '<select class="select-ctl" aria-label="Institution category" data-action="inst-cat">' + catOptions + '</select>' +
       '<span class="register-count">' + rows.length + ' of ' + data.length + '</span>' +
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +
@@ -142,7 +142,7 @@
     }).join('');
 
     var body = rows.map(function (v) {
-      return '<tr data-action="open-vendor" data-name="' + esc(v.name) + '">' +
+      return '<tr tabindex="0" data-action="open-vendor" data-name="' + esc(v.name) + '">' +
         '<td class="cell-rank">' + String(v.rank).padStart(2, "0") + '</td>' +
         '<td><div class="cell-name">' + esc(v.name) + '</div>' +
         (!compact ? '<div class="cell-meta">' + esc(v.domain) + ' · ' + esc(v.hq) + '</div>' : '') + '</td>' +
@@ -183,7 +183,7 @@
     return '<div class="register">' +
       '<div class="register-toolbar">' + statusPills(opts.statusFilter, "vendor-status") +
       '<span class="spacer"></span>' +
-      '<select class="select-ctl" data-action="vendor-type">' + typeOptions + '</select>' +
+      '<select class="select-ctl" aria-label="Provider type" data-action="vendor-type">' + typeOptions + '</select>' +
       '<span class="register-count">' + rows.length + ' of ' + data.length + '</span>' +
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +

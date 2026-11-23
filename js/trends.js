@@ -4,9 +4,7 @@
    CSS variables must be set via style="" (presentation attributes don't take var()). */
 
 (function () {
-  function band(score) {
-    return score >= 70 ? "Advanced" : score >= 45 ? "In progress" : score >= 25 ? "Early stage" : "Not evident";
-  }
+  var band = window.PQC_SCORE.band;
   function bandColor(status) { return (window.READINESS[status] || {}).c || "var(--fg-3)"; }
 
   function hist() { return window.PQC_HISTORY || { dates: [], inst: {}, vendor: {} }; }
@@ -25,6 +23,16 @@
     return c;
   }
 
+  // Axis label for an ISO date: "Jun 13", with the year once the history
+  // spans more than one calendar year ("Jan 4 '27").
+  var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function dayLabel(d, dates) {
+    var multiYear = dates.length && dates[0].slice(0, 4) !== dates[dates.length - 1].slice(0, 4);
+    return MONTHS[+d.slice(5, 7) - 1] + " " + (+d.slice(8, 10)) + (multiYear ? " '" + d.slice(2, 4) : "");
+  }
+  // Show ~8 evenly spaced labels, always including the most recent date.
+  function showLabel(i, n) { return n <= 8 || i === n - 1 || (i % Math.ceil(n / 8) === 0 && n - 1 - i >= Math.ceil(n / 8) * 0.75); }
+
   /* ---- SVG line chart -------------------------------------------------------- */
   function lineChart(dates, series, opts) {
     opts = opts || {};
@@ -39,8 +47,8 @@
       svg += '<text x="' + (padL - 6) + '" y="' + (yy + 3) + '" text-anchor="end" style="font-size:10px;fill:var(--fg-3);font-family:var(--font-mono)">' + g + '</text>';
     });
     dates.forEach(function (d, i) {
-      if (n > 8 && i % Math.ceil(n / 8) !== 0 && i !== n - 1) return;
-      svg += '<text x="' + X(i) + '" y="' + (H - 9) + '" text-anchor="middle" style="font-size:9.5px;fill:var(--fg-3);font-family:var(--font-mono)">' + d.slice(5) + '</text>';
+      if (!showLabel(i, n)) return;
+      svg += '<text x="' + X(i) + '" y="' + (H - 9) + '" text-anchor="' + (i === 0 ? "start" : i === n - 1 ? "end" : "middle") + '" style="font-size:9.5px;fill:var(--fg-3);font-family:var(--font-mono)">' + dayLabel(d, dates) + '</text>';
     });
     series.forEach(function (s) {
       var dstr = '', started = false, dots = '', pts = 0;
@@ -54,28 +62,41 @@
       });
       svg += '<path d="' + dstr + '" style="fill:none;stroke:' + s.color + ';stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/>' + dots;
     });
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="line chart">' + svg + '</svg>';
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Readiness score over time">' + svg + '</svg>';
   }
 
   /* ---- SVG stacked bars (status mix per date) -------------------------------- */
+  // Long histories are sampled to at most ~26 bars (always ending on the latest
+  // date) so bars stay legible; each bar is the share of entities tracked that day.
   function stackedBars(dates, group) {
     var W = 700, H = 240, padL = 28, padR = 14, padT = 10, padB = 30;
-    var n = dates.length;
     var plotH = H - padT - padB, plotW = W - padL - padR;
-    var total = Object.keys(group).length || 1;
-    var bw = Math.min(46, (plotW / n) * 0.6);
+    var step = Math.max(1, Math.ceil(dates.length / 26));
+    var idx = [];
+    for (var j = dates.length - 1; j >= 0; j -= step) idx.unshift(j);
+    var n = idx.length;
+    var bw = Math.min(46, (plotW / Math.max(n, 1)) * 0.6);
     var svg = '';
-    dates.forEach(function (d, i) {
+    idx.forEach(function (di, i) {
       var cx = n <= 1 ? padL + plotW / 2 : padL + i * plotW / (n - 1);
       var x = cx - bw / 2, yTop = padT + plotH;
+      var counts = statusCounts(group, di);
+      var total = 0;
+      window.STATUS_ORDER.forEach(function (st) { total += counts[st]; });
+      if (!total) return;
       window.STATUS_ORDER.slice().reverse().forEach(function (st) { // Not evident at bottom → Advanced on top
-        var c = statusCounts(group, i)[st];
-        var h = (c / total) * plotH;
-        if (h > 0) { yTop -= h; svg += '<rect x="' + x.toFixed(1) + '" y="' + yTop.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" style="fill:' + bandColor(st) + '"/>'; }
+        var h = (counts[st] / total) * plotH;
+        if (h > 0) {
+          yTop -= h;
+          svg += '<rect x="' + x.toFixed(1) + '" y="' + yTop.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) +
+            '" style="fill:' + bandColor(st) + '"><title>' + esc(dayLabel(dates[di], dates) + " · " + st + ": " + counts[st]) + '</title></rect>';
+        }
       });
-      svg += '<text x="' + cx + '" y="' + (H - 9) + '" text-anchor="middle" style="font-size:9.5px;fill:var(--fg-3);font-family:var(--font-mono)">' + d.slice(5) + '</text>';
+      if (showLabel(i, n)) {
+        svg += '<text x="' + cx + '" y="' + (H - 9) + '" text-anchor="' + (n > 1 && i === 0 ? "start" : n > 1 && i === n - 1 ? "end" : "middle") + '" style="font-size:9.5px;fill:var(--fg-3);font-family:var(--font-mono)">' + dayLabel(dates[di], dates) + '</text>';
+      }
     });
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="status mix">' + svg + '</svg>';
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Status mix over time">' + svg + '</svg>';
   }
 
   function legend(items) {
@@ -85,9 +106,12 @@
   }
 
   /* ---- Movers (biggest score change across the window) ----------------------- */
-  function movers(group) {
+  function movers(group, current) {
     var out = [];
+    var live = {};
+    (current || []).forEach(function (x) { live[x.name] = true; });
     Object.keys(group).forEach(function (k) {
+      if (current && !live[k]) return; // dropped from the dataset — not clickable, not "now"
       var arr = group[k].filter(function (v) { return v != null; });
       if (arr.length < 2) return;
       var delta = arr[arr.length - 1] - arr[0];
@@ -142,15 +166,15 @@
       legend(window.STATUS_ORDER.map(function (st) { return { label: st, c: bandColor(st) }; })));
 
     // Movers
-    var mv = movers(group);
+    var mv = movers(group, cohort === "vendor" ? window.VENDORS : window.INSTITUTIONS);
     var moversInner;
     if (!mv.length) {
       moversInner = '<div class="feed-empty" style="padding:24px 16px">No rating changes captured yet — snapshots are identical so far. Movers appear here automatically once a score changes between days.</div>';
     } else {
       moversInner = '<div style="display:grid;gap:2px">' + mv.slice(0, 8).map(function (m) {
         var up = m.delta > 0;
-        return '<div class="mover-row" data-action="' + (cohort === "vendor" ? "open-vendor" : "open-inst") + '" data-name="' + esc(m.name) + '">' +
-          '<span class="mover-name" style="grid-column:1/2">' + esc(m.name) + '</span>' +
+        return '<div class="mover-row" tabindex="0" role="button" data-action="' + (cohort === "vendor" ? "open-vendor" : "open-inst") + '" data-name="' + esc(m.name) + '">' +
+          '<span class="mover-name" style="grid-column:1/3">' + esc(m.name) + '</span>' +
           '<span style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:' + (up ? "var(--success)" : "var(--danger)") + '">' +
           (up ? "▲ +" : "▼ ") + m.delta + '</span>' +
           '<span style="font-family:var(--font-mono);font-size:13px;color:var(--fg-3)">now ' + m.now + '</span></div>';
@@ -170,7 +194,7 @@
       Object.keys(h.vendor).map(function (nm) { return '<option value="vendor::' + esc(nm) + '"' + (sel === "vendor::" + nm ? " selected" : "") + '>' + esc(nm) + '</option>'; }).join('') + '</optgroup>'].join('');
     var explorerCard = card({ title: "Track a single entity", sub: "Readiness score over time for one institution or third party" },
       '<div class="trends-explorer-head">' +
-      '<select class="select-ctl" data-action="trends-entity">' + options + '</select>' +
+      '<select class="select-ctl" aria-label="Entity to chart" data-action="trends-entity">' + options + '</select>' +
       '<span class="trends-entity-now">' + readinessBadge(band(ec.last)) +
       '<span class="trends-entity-delta">' + esc(ec.deltaTxt) + '</span></span></div>' +
       ec.chart);

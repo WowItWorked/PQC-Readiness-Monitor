@@ -7,7 +7,7 @@
     var defaults = { density: "comfortable", scoreStyle: "bar", showConfidence: true };
     try {
       var saved = JSON.parse(localStorage.getItem(PREFS_KEY));
-      return Object.assign(defaults, saved || {});
+      return Object.assign(defaults, saved && typeof saved === "object" ? saved : {});
     } catch (e) { return defaults; }
   }
 
@@ -41,6 +41,8 @@
   }
   function detectDevice() {
     state.isMobile = computeIsMobile();
+    var search = document.getElementById("global-search");
+    if (search) search.placeholder = state.isMobile ? "Search…" : "Search institutions…";
     var app = document.querySelector(".app");
     if (app) {
       app.classList.toggle("is-mobile", state.isMobile);
@@ -84,7 +86,8 @@
       return '<div class="nav-group"><div class="nav-group-label">' + esc(g.label) + '</div>' +
         g.items.map(function (it) {
           var on = state.active === it[0];
-          return '<a class="nav-item' + (on ? ' active' : '') + '" data-view="' + it[0] + '">' +
+          return '<a class="nav-item' + (on ? ' active' : '') + '" href="#' + it[0] + '" data-view="' + it[0] + '"' +
+            (on ? ' aria-current="page"' : '') + '>' +
             icon(it[2], 18) + esc(it[1]) + '</a>';
         }).join('') + '</div>';
     }).join('');
@@ -103,12 +106,12 @@
       '</aside>' +
       '<div class="main-col">' +
       '<header class="topbar">' +
-      '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu">' + icon("menu", 20) + '</button>' +
+      '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu" aria-expanded="false">' + icon("menu", 20) + '</button>' +
       '<div class="topbar-titles"><div class="topbar-crumb" id="crumb"></div>' +
       '<div class="topbar-title" id="title"></div></div>' +
       '<span class="asof-chip">' + icon("calendar", 14, "var(--fg-3)") + 'Data as of ' + esc(window.PQC_NEWS.asOf) + '</span>' +
       '<div class="search-wrap">' + icon("search", 17) +
-      '<input class="search-input" id="global-search" placeholder="Search institutions…"></div>' +
+      '<input class="search-input" id="global-search" type="search" aria-label="Search institutions and third parties" placeholder="Search institutions…"></div>' +
       '</header>' +
       '<div role="note" style="display:flex; align-items:flex-start; gap:10px; padding:10px 28px; background:var(--warning-bg); border-bottom:1px solid var(--warning-line); flex:none;">' +
       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 20h16a2 2 0 0 0 1.73-2Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>' +
@@ -156,10 +159,18 @@
   function setNav(open) {
     var app = document.querySelector(".app");
     if (app) app.classList.toggle("nav-open", open);
+    var t = document.querySelector(".nav-toggle");
+    if (t) t.setAttribute("aria-expanded", open ? "true" : "false");
   }
 
   function navigate(view) {
+    if (!VIEWS[view]) view = "overview";
     state.active = view;
+    // Mirror the view in the URL so views are linkable and Back works.
+    var hash = view === "overview" ? "" : "#" + view;
+    if (location.hash !== hash) {
+      history.pushState(null, "", hash || location.pathname + location.search);
+    }
     state.viewoptsOpen = false;
     setNav(false); // close the mobile menu after choosing a destination
     renderChrome();
@@ -180,7 +191,7 @@
   /* ---- Events ------------------------------------------------------------- */
   document.addEventListener("click", function (e) {
     var nav = e.target.closest("[data-view]");
-    if (nav) { navigate(nav.getAttribute("data-view")); return; }
+    if (nav) { e.preventDefault(); navigate(nav.getAttribute("data-view")); return; }
 
     var el = e.target.closest("[data-action]");
     if (!el) return;
@@ -288,7 +299,12 @@
   }, true);
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && isDrawerOpen()) closeDrawer();
+    if (e.key === "Escape" && isDrawerOpen()) { closeDrawer(); return; }
+    // Rows and cards that act as buttons respond to Enter / Space like buttons.
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches('[tabindex="0"][data-action]')) {
+      e.preventDefault();
+      e.target.click();
+    }
   });
 
   // Live filtering as the reader types in a feed's search box.
@@ -326,6 +342,16 @@
 
   /* ---- Boot ---------------------------------------------------------------- */
   document.getElementById("app").innerHTML = shellHtml();
+  var initial = location.hash.slice(1);
+  if (VIEWS[initial]) state.active = initial;
+  window.addEventListener("popstate", function () {
+    var v = location.hash.slice(1);
+    state.active = VIEWS[v] ? v : "overview";
+    state.viewoptsOpen = false;
+    setNav(false);
+    renderChrome();
+    renderMain();
+  });
   detectDevice();
   renderChrome();
   renderMain();

@@ -21,5 +21,22 @@
     var s = baseline + d;
     return s < 0 ? 0 : s > 100 ? 100 : s;
   }
-  g.PQC_SCORE = { adjust: adjust, TLS_POINTS: TLS_POINTS };
+  // Single source of truth for status: always derived from the (scan-adjusted)
+  // score, so labels, filters, trends, and history can never disagree.
+  function band(score) {
+    return score >= 70 ? "Advanced" : score >= 45 ? "In progress" : score >= 25 ? "Early stage" : "Not evident";
+  }
+  // Apply an observed TLS result to an institution record in place, then
+  // re-derive its status. Shared by the browser overlay and the snapshot script.
+  function applyScan(b, observed, scannedAt) {
+    if (observed && observed !== "unknown") {
+      b.score = adjust(b.score, b.tls, observed);
+      b.tls = observed;
+      b.tlsObserved = true;
+      if (scannedAt) b.tlsScanned = scannedAt;
+    }
+    b.status = band(b.score);
+    return b;
+  }
+  g.PQC_SCORE = { adjust: adjust, band: band, applyScan: applyScan, TLS_POINTS: TLS_POINTS };
 })(typeof window !== "undefined" ? window : globalThis);

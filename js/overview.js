@@ -15,7 +15,7 @@
     var rows = STATUS_ORDER.map(function (st) {
       var n = data.filter(function (b) { return b.status === st; }).length;
       var m = READINESS[st];
-      return '<div class="dist-row" data-action="pick-status" data-status="' + esc(st) + '">' +
+      return '<div class="dist-row" tabindex="0" role="button" data-action="pick-status" data-status="' + esc(st) + '">' +
         '<span class="dist-row-label">' + esc(st) + '</span>' +
         '<div class="dist-track"><div class="dist-fill" style="width:' + (n / total) * 100 + '%;background:' + m.c + '"></div></div>' +
         '<span class="dist-count">' + n + '</span></div>';
@@ -58,7 +58,9 @@
   function timeline() {
     var start = 2024, end = 2036.5;
     var pos = function (y) { return ((y - start) / (end - start)) * 100 + "%"; };
-    var now = 2026.45;
+    // "Today" marker tracks the real date so it never goes stale between deploys.
+    var d = new Date();
+    var now = d.getFullYear() + (d.getMonth() + d.getDate() / 31) / 12;
     var crqcStart = 2030;
     var marks = [
       { y: 2024.62, lane: "t2", anchor: "start", label: "FIPS 203/204/205 final", sub: "NIST · Aug 2024" },
@@ -124,20 +126,77 @@
       }).join('') + '</div>' +
       '</div></div>' +
       '<div class="tl-footnote">Google Quantum AI research (May 2025) cut the estimated cost of breaking RSA-2048 ' +
-      'twenty-fold — to under one million noisy qubits running for about a week. Expert surveys now put 10-year ' +
+      'twenty-fold — to under one million noisy qubits running for about a week. As of 2025, expert surveys put 10-year ' +
       'CRQC probability at 28–49%, the highest recorded. Google responded by committing to complete its own PQC ' +
       'migration by 2029.</div>';
 
     return card({
       title: "Migration deadline timeline",
-      sub: "Standards, policy, and industry projections — Google now believes a CRQC could break standard encryption and has set itself a 2029 migration deadline",
+      sub: "Standards, policy, and industry projections — after its 2025 resource estimate, Google set itself a 2029 migration deadline",
     }, inner);
+  }
+
+  /* ---- Landing hero ------------------------------------------------------- */
+  // Decorative lattice — a nod to the lattice math behind ML-KEM / ML-DSA.
+  function latticeSvg() {
+    var pts = [], lines = [], cols = 11, rows = 7, dx = 56, dy = 52;
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var x = c * dx + (r % 2 ? dx / 2 : 0) + 20, y = r * dy + 20;
+        pts.push('<circle cx="' + x + '" cy="' + y + '" r="' + ((r * 7 + c * 3) % 5 === 0 ? 3.2 : 1.6) + '"/>');
+        if (c < cols - 1) lines.push('<line x1="' + x + '" y1="' + y + '" x2="' + (x + dx) + '" y2="' + y + '"/>');
+        if (r < rows - 1) {
+          var nx = x + (r % 2 ? dx / 2 : -dx / 2);
+          lines.push('<line x1="' + x + '" y1="' + y + '" x2="' + nx + '" y2="' + (y + dy) + '"/>');
+        }
+      }
+    }
+    return '<svg class="hero-lattice" viewBox="0 0 640 360" aria-hidden="true" focusable="false">' +
+      '<g class="hero-lattice-lines">' + lines.join('') + '</g>' +
+      '<g class="hero-lattice-dots">' + pts.join('') + '</g></svg>';
+  }
+
+  // NIST IR 8547: quantum-vulnerable public-key algorithms deprecated after 2030.
+  var DEPRECATION = new Date(2031, 0, 1);
+
+  function heroStat(value, label, sub) {
+    return '<div class="hero-stat"><div class="hero-stat-value">' + value + '</div>' +
+      '<div class="hero-stat-label">' + esc(label) + '</div>' +
+      (sub ? '<div class="hero-stat-sub">' + esc(sub) + '</div>' : '') + '</div>';
+  }
+
+  function hero(data) {
+    var vendors = window.VENDORS || [];
+    var active = data.filter(function (b) { return b.status === "Advanced" || b.status === "In progress"; }).length;
+    var shipping = vendors.filter(function (v) { return v.pqc === "shipping"; }).length;
+    var live = data.filter(function (b) { return b.tls === "live"; }).length;
+    var years = Math.max(0, (DEPRECATION - new Date()) / (365.25 * 864e5));
+    return '<section class="hero" aria-labelledby="hero-title">' + latticeSvg() +
+      '<div class="hero-inner">' +
+      '<div class="hero-eyebrow">Post-quantum cryptography &middot; U.S. financial sector</div>' +
+      '<h1 class="hero-title" id="hero-title">Tracking the financial sector&rsquo;s race to quantum-safe encryption</h1>' +
+      '<p class="hero-lead">The RSA and elliptic-curve cryptography that protects payments, accounts, and ' +
+      'market infrastructure will not survive a cryptographically relevant quantum computer &mdash; and data ' +
+      'harvested today can be decrypted later. This monitor tracks public evidence of post-quantum migration across ' +
+      'the ' + data.length + ' largest U.S. financial institutions and the ' + vendors.length +
+      ' third parties they depend on, refreshed daily.</p>' +
+      '<div class="hero-ctas">' +
+      '<a class="hero-btn primary" href="#institutions" data-view="institutions">Explore institutions ' + icon("arrow-right", 16) + '</a>' +
+      '<a class="hero-btn" href="#vendors" data-view="vendors">Third-party providers</a>' +
+      '<a class="hero-link" href="#methodology" data-view="methodology">How readiness is scored</a>' +
+      '</div>' +
+      '<div class="hero-stats">' +
+      heroStat(active + '<span>/' + data.length + '</span>', "Institutions with active programs", "Advanced or in-progress public signals") +
+      heroStat(shipping + '<span>/' + vendors.length + '</span>', "Third parties shipping PQC", "Available in products banks consume") +
+      heroStat(String(live), "Bank websites on hybrid TLS", "ML-KEM key exchange observed") +
+      heroStat(years.toFixed(1) + '<span> yrs</span>', "Until RSA/ECC deprecation", "NIST IR 8547 \u00b7 after 2030") +
+      '</div></div></section>';
   }
 
   /* ---- Leaders / watch list ---------------------------------------------- */
   function moverList(items, valueColor) {
     return items.map(function (b) {
-      return '<a class="mover-row" data-action="open-inst" data-name="' + esc(b.name) + '">' +
+      return '<a class="mover-row" tabindex="0" role="button" data-action="open-inst" data-name="' + esc(b.name) + '">' +
         '<span class="mover-rank">' + String(b.rank).padStart(2, "0") + '</span>' +
         '<span class="mover-name">' + esc(b.name) + '</span>' +
         readinessBadge(b.status) +
@@ -157,17 +216,34 @@
       '</div>';
   }
 
+  // Change in the institutions' average score over the last 30 recorded days.
+  function trend30() {
+    var h = window.PQC_HISTORY;
+    if (!h || !h.dates || h.dates.length < 2) return "—";
+    var last = h.dates.length - 1, first = Math.max(0, last - 30);
+    function avg(i) {
+      var sum = 0, n = 0;
+      Object.keys(h.inst).forEach(function (k) { var v = h.inst[k][i]; if (v != null) { sum += v; n++; } });
+      return n ? sum / n : null;
+    }
+    var a = avg(first), b = avg(last);
+    if (a == null || b == null) return "—";
+    var d = Math.round((b - a) * 10) / 10;
+    return (d > 0 ? "+" : d < 0 ? "−" : "±") + Math.abs(d).toFixed(1);
+  }
+
   window.renderOverview = function (data) {
-    var live = data.filter(function (b) { return b.tls === "live"; }).length;
-    var active = data.filter(function (b) { return b.status === "Advanced" || b.status === "In progress"; }).length;
+    var notEvident = data.filter(function (b) { return b.status === "Not evident"; }).length;
     var documented = data.filter(function (b) { return b.conf === "Documented"; }).length;
-    var median = data.map(function (b) { return b.score; }).sort(function (a, b) { return a - b; })[Math.floor(data.length / 2)];
-    return '<div class="overview">' +
+    var sorted = data.map(function (b) { return b.score; }).sort(function (a, b) { return a - b; });
+    var mid = Math.floor(sorted.length / 2);
+    var median = !sorted.length ? "—" : sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    return hero(data) + '<div class="overview">' +
       '<div class="kpi-grid">' +
-      kpiCard("landmark", "Institutions tracked", data.length, "Top U.S. institutions by total assets") +
-      kpiCard("shield-check", "Hybrid TLS live", live, "ML-KEM key exchange on primary website") +
-      kpiCard("activity", "Active programs", active, "Advanced or in-progress public signals") +
-      kpiCard("gauge", "Median readiness", String(median), "of 100 · " + documented + " institutions with documented evidence") +
+      kpiCard("gauge", "Median readiness", String(median), "of 100 across " + data.length + " institutions") +
+      kpiCard("activity", "30-day change", trend30(), "in the institutions' average score") +
+      kpiCard("shield-x", "No public signals", notEvident, "institutions rated Not evident") +
+      kpiCard("shield-check", "Documented evidence", documented, "ratings backed by direct public disclosure") +
       '</div>' +
       '<div class="dist-grid">' + distribution(data) + sizeTiers(data) + '</div>' +
       timeline() +

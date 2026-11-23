@@ -38,7 +38,9 @@
     "SandboxAQ": "https://www.sandboxaq.com/",
   };
   function newsUrl(item) {
-    if (item && item.url) return item.url;
+    // Only http(s) links are ever rendered — a feed field like "javascript:…"
+    // would otherwise become a clickable script URL.
+    if (item && item.url && /^https?:\/\//i.test(item.url)) return item.url;
     var s = item && item.s ? String(item.s) : "";
     if (NEWS_SOURCE[s]) return NEWS_SOURCE[s];
     if (/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(s)) return "https://" + s; // domain-style source
