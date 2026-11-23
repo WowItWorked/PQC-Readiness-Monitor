@@ -558,3 +558,35 @@ p.drawer-summary { font-size: 14px; line-height: 22px; color: var(--fg-2); margi
   .lp .tl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .lp .tl-inner { min-width: 680px; }
 }
+
+/* Front page — audience guide */
+.lp-audience { border-top-color: var(--brand-ink); }
+.lp-audience .lp-card-icon { margin-bottom: 4px; }
+.lp-questions { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 6px;
+  font-size: 13.5px; line-height: 1.5; color: var(--fg-1); }
+.lp-questions li::marker { color: var(--brand-accent-700); }
+
+/* Drawer — plain-language first, technical detail on request */
+.rb-plain { font-size: 13.5px; line-height: 1.55; color: var(--fg-1); }
+.rb-tech-wrap { margin-top: 4px; }
+.rb-tech-wrap summary { font-size: 12px; font-weight: 600; color: var(--fg-link); cursor: pointer; list-style: none;
+  display: inline-flex; align-items: center; gap: 4px; }
+.rb-tech-wrap summary::-webkit-details-marker { display: none; }
+.rb-tech-wrap summary::before { content: "▸"; font-size: 10px; transition: transform var(--dur-fast) var(--ease-standard); }
+.rb-tech-wrap[open] summary::before { transform: rotate(90deg); }
+.rb-tech-wrap .rb-tech { margin-top: 4px; font-size: 12.5px; color: var(--fg-2); padding-left: 12px;
+  border-left: 2px solid var(--line-1); }
+.rb-verdict { margin: 0 0 14px; }
+.drawer-questions { margin: 0; padding: 0 0 0 18px; display: grid; gap: 8px; }
+.drawer-questions li { font-size: 13.5px; line-height: 1.5; color: var(--fg-1); }
+.drawer-questions li::marker { color: var(--brand-accent-700); }
+
+/* Methodology glossary */
+.gloss { margin: 0; display: grid; gap: 10px; }
+.gloss-row { display: grid; grid-template-columns: 210px 1fr; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line-1); }
+.gloss-row:last-child { border-bottom: none; padding-bottom: 0; }
+.gloss dt { font-weight: 700; color: var(--fg-1); }
+.gloss dd { margin: 0; }
+.method-section code { font-family: var(--font-mono); font-size: 12.5px; background: var(--bg-2); padding: 1px 5px; border-radius: 3px; }
+@media (max-width: 560px) { .gloss-row { grid-template-columns: 1fr; gap: 2px; } }
+p.drawer-research, .drawer-research { font-size: 13px; line-height: 1.6; color: var(--fg-2); margin: 0; }

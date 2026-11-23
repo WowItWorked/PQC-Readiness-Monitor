@@ -54,21 +54,21 @@
     home:         { title: "PQC Readiness Monitor", crumb: "" },
     overview:     { title: "Dashboard", crumb: "Monitor" },
     institutions: { title: "Top 100 Institutions", crumb: "Monitor" },
-    vendors:      { title: "Top 100 Third Parties", crumb: "Monitor" },
+    vendors:      { title: "Top 100 Third-Party Providers", crumb: "Monitor" },
     standards:    { title: "Standards & Policy", crumb: "Intelligence" },
     guidance:     { title: "Implementation Guidance", crumb: "Intelligence" },
     sector:       { title: "Financial Sector News", crumb: "Intelligence" },
     vendornews:   { title: "Third-Party News", crumb: "Intelligence" },
     trends:       { title: "Readiness Trends", crumb: "Monitor" },
-    methodology:  { title: "Methodology", crumb: "Reference" },
+    methodology:  { title: "How We Rate", crumb: "Reference" },
   };
 
   var NAV_GROUPS = [
     { label: "Monitor", items: [
       ["overview", "Dashboard", "layout-dashboard"],
       ["institutions", "Institutions", "landmark"],
-      ["vendors", "Third Parties", "boxes"],
-      ["trends", "Readiness Trends", "trending-up"],
+      ["vendors", "Third-Party Providers", "boxes"],
+      ["trends", "Trends", "trending-up"],
     ]},
     { label: "Intelligence", items: [
       ["standards", "Standards & Policy", "scale"],
@@ -77,7 +77,7 @@
       ["vendornews", "Third-Party News", "rss"],
     ]},
     { label: "Reference", items: [
-      ["methodology", "Methodology", "book-open"],
+      ["methodology", "How We Rate", "book-open"],
     ]},
   ];
 
@@ -101,16 +101,16 @@
       '<span class="logo-text"><span class="logo-kicker">Emerging Tech Risk</span><span>Financial Sector</span><span>PQC Readiness</span></span>' +
       '</a></div>' +
       '<nav class="sidebar-nav" id="nav"></nav>' +
-      '<div class="sidebar-foot">Ratings reviewed ' + esc(pqcFreshness().ratings) + ' · TLS scanned ' +
-      esc(pqcFreshness().tls) + '. Assessments from public signals — see Methodology.</div>' +
+      '<div class="sidebar-foot">Ratings reviewed ' + esc(pqcFreshness().ratings) + ' · websites checked ' +
+      esc(pqcFreshness().tls) + '. Ratings are based on public evidence — see How We Rate.</div>' +
       '</aside>' +
       '<div class="main-col">' +
       '<header class="topbar">' +
       '<button class="nav-toggle" data-action="toggle-nav" aria-label="Open menu" aria-expanded="false">' + icon("menu", 20) + '</button>' +
       '<div class="topbar-titles"><div class="topbar-crumb" id="crumb"></div>' +
       '<div class="topbar-title" id="title"></div></div>' +
-      '<span class="asof-chip" title="Firm ratings are curated; the website TLS scan runs daily.">' + icon("calendar", 14, "var(--fg-3)") +
-      'Ratings ' + esc(pqcFreshness().ratings) + ' · TLS scan ' + esc(pqcFreshness().tls) + '</span>' +
+      '<span class="asof-chip" title="Ratings are reviewed by researchers; websites are checked automatically every day.">' + icon("calendar", 14, "var(--fg-3)") +
+      'Ratings ' + esc(pqcFreshness().ratings) + ' · Websites checked ' + esc(pqcFreshness().tls) + '</span>' +
       '<div class="search-wrap">' + icon("search", 17) +
       '<input class="search-input" id="global-search" type="search" aria-label="Search institutions and third parties" placeholder="Search institutions…"></div>' +
       '</header>' +

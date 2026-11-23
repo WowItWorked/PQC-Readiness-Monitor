@@ -33,8 +33,8 @@
       '<summary>' + icon("sliders-horizontal", 15) + 'View</summary>' +
       '<div class="viewopts-panel">' +
       '<div class="viewopts-row"><span class="viewopts-label">Density</span>' + seg("density", ["comfortable", "compact"], prefs.density) + '</div>' +
-      '<div class="viewopts-row"><span class="viewopts-label">Score style</span>' + seg("scoreStyle", ["bar", "number"], prefs.scoreStyle) + '</div>' +
-      '<label class="viewopts-toggle">Evidence column<input type="checkbox" data-action="toggle-evidence"' +
+      '<div class="viewopts-row"><span class="viewopts-label">Score display</span>' + seg("scoreStyle", ["bar", "number"], prefs.scoreStyle) + '</div>' +
+      '<label class="viewopts-toggle">Show evidence level<input type="checkbox" data-action="toggle-evidence"' +
       (prefs.showConfidence ? ' checked' : '') + '></label>' +
       '</div></details>';
   }
@@ -85,7 +85,7 @@
         '</tr>';
     }).join('');
     if (!rows.length) {
-      body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No institutions match. Boring, in the best way.</td></tr>';
+      body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No institutions match. Try clearing the filters or search.</td></tr>';
     }
 
     var listing;
@@ -99,11 +99,11 @@
               '<span class="reg-tag mono">' + fmtAssets(b.assets) + '</span>' +
               tlsChip(b.tls) + (showConf ? confChip(b.conf) : ''));
           }).join('') + '</div>'
-        : '<div class="feed-empty">No institutions match. Boring, in the best way.</div>';
+        : '<div class="feed-empty">No institutions match. Try clearing the filters or search.</div>';
     } else {
       listing = '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
         '<thead><tr><th style="width:56px">#</th><th>Institution</th><th class="num" style="width:120px">Assets</th>' +
-        '<th style="width:130px">Category</th><th style="width:128px">Web TLS</th><th style="width:118px">Readiness</th>' +
+        '<th style="width:130px">Category</th><th style="width:128px">Website encryption</th><th style="width:118px">Rating</th>' +
         '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
         (showConf ? '<th style="width:106px">Evidence</th>' : '') +
         '</tr></thead><tbody>' + body + '</tbody></table></div>';
@@ -117,8 +117,9 @@
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +
       listing +
-      '<div class="register-footnote">Assets are approximate (Q1 2026). Rows marked <strong>Estimated</strong> are ' +
-      'representative assessments pending a verification pass — see Methodology.</div>' +
+      '<div class="register-footnote">Assets are approximate (Q1 2026). <strong>Website encryption</strong> shows whether the institution\'s main website ' +
+      'already uses quantum-safe encryption, confirmed by a daily automated check. Rows marked <strong>Estimated</strong> are ' +
+      'placeholders until we research them in detail. Select any row for an explanation of its rating.</div>' +
       '</div>';
   };
 
@@ -155,7 +156,7 @@
         '</tr>';
     }).join('');
     if (!rows.length) {
-      body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No providers match. Boring, in the best way.</td></tr>';
+      body = '<tr><td colspan="' + (showConf ? 8 : 7) + '" class="cell-empty">No providers match. Try clearing the filters or search.</td></tr>';
     }
 
     var listing;
@@ -169,12 +170,12 @@
               '<span class="reg-tag mono">' + fmtRev(v.rev) + '</span>' +
               pqcChip(v.pqc) + (showConf ? confChip(v.conf) : ''));
           }).join('') + '</div>'
-        : '<div class="feed-empty">No providers match. Boring, in the best way.</div>';
+        : '<div class="feed-empty">No providers match. Try clearing the filters or search.</div>';
     } else {
       listing = '<div class="table-card"><table class="register-table' + (compact ? ' compact' : '') + '">' +
         '<thead><tr><th style="width:56px">#</th><th>Provider</th><th style="width:160px">Type</th>' +
-        '<th class="num" style="width:104px">Revenue</th><th style="width:140px">Product PQC</th>' +
-        '<th style="width:118px">Readiness</th>' +
+        '<th class="num" style="width:104px">Revenue</th><th style="width:140px">Quantum-safe products</th>' +
+        '<th style="width:118px">Rating</th>' +
         '<th style="width:' + (scoreMode === "bar" ? 112 : 64) + 'px">Score</th>' +
         (showConf ? '<th style="width:106px">Evidence</th>' : '') +
         '</tr></thead><tbody>' + body + '</tbody></table></div>';
@@ -188,8 +189,9 @@
       viewOpts(opts.prefs, opts.voOpen) +
       '</div>' +
       listing +
-      '<div class="register-footnote">Revenue is approximate annual revenue, company-wide unless a segment is the ' +
-      'relevant unit. Readiness here means PQC support in the products and services financial institutions consume.</div>' +
+      '<div class="register-footnote">Revenue is approximate annual revenue. For providers, the rating reflects whether the products and ' +
+      'services financial institutions buy offer quantum-safe protection, and how clearly the provider has published its plans. ' +
+      'Select any row for an explanation and questions to raise with the provider.</div>' +
       '</div>';
   };
 })();

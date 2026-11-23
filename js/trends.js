@@ -148,7 +148,7 @@
     var instAvg = avgSeries(h.inst, dates), vAvg = avgSeries(h.vendor, dates);
 
     // Cohort average line
-    var avgCard = card({ title: "Average readiness over time", sub: "Mean score across each cohort · 0–100" },
+    var avgCard = card({ title: "Average score over time", sub: "Average readiness score for institutions and for providers · 0–100" },
       lineChart(dates, [
         { label: "Institutions", color: "var(--brand-ink)", points: instAvg },
         { label: "Third parties", color: "var(--brand-accent)", points: vAvg },
@@ -161,7 +161,7 @@
         return '<button data-action="trends-cohort" data-cohort="' + cv + '"' + (cohort === cv ? ' class="active"' : '') + '>' +
           (cv === "vendor" ? "Third parties" : "Institutions") + '</button>';
       }).join('') + '</div>';
-    var mixCard = card({ title: "Status distribution over time", sub: cohortLabel + " · share of each readiness band per snapshot" },
+    var mixCard = card({ title: "Status distribution over time", sub: cohortLabel + " · share in each rating, day by day" },
       toggle + stackedBars(dates, group) +
       legend(window.STATUS_ORDER.map(function (st) { return { label: st, c: bandColor(st) }; })));
 
@@ -180,7 +180,7 @@
           '<span style="font-family:var(--font-mono);font-size:13px;color:var(--fg-3)">now ' + m.now + '</span></div>';
       }).join('') + '</div>';
     }
-    var moversCard = card({ title: "Biggest movers", sub: cohortLabel + " · score change across the captured window" }, moversInner);
+    var moversCard = card({ title: "Biggest movers", sub: cohortLabel + " · largest score changes since records began" }, moversInner);
 
     // Per-entity explorer
     var sel = opts.entity || ("inst::" + Object.keys(h.inst)[0]);
@@ -192,23 +192,22 @@
       Object.keys(h.inst).map(function (nm) { return '<option value="inst::' + esc(nm) + '"' + (sel === "inst::" + nm ? " selected" : "") + '>' + esc(nm) + '</option>'; }).join('') + '</optgroup>',
       '<optgroup label="Third parties">' +
       Object.keys(h.vendor).map(function (nm) { return '<option value="vendor::' + esc(nm) + '"' + (sel === "vendor::" + nm ? " selected" : "") + '>' + esc(nm) + '</option>'; }).join('') + '</optgroup>'].join('');
-    var explorerCard = card({ title: "Track a single entity", sub: "Readiness score over time for one institution or third party" },
+    var explorerCard = card({ title: "Track one organization", sub: "Score over time for a single institution or provider" },
       '<div class="trends-explorer-head">' +
-      '<select class="select-ctl" aria-label="Entity to chart" data-action="trends-entity">' + options + '</select>' +
+      '<select class="select-ctl" aria-label="Organization to chart" data-action="trends-entity">' + options + '</select>' +
       '<span class="trends-entity-now">' + readinessBadge(band(ec.last)) +
       '<span class="trends-entity-delta">' + esc(ec.deltaTxt) + '</span></span></div>' +
       ec.chart);
 
     return '<div class="trends">' +
       '<div class="trends-summary">' + icon("trending-up", 16, "var(--brand-accent)") +
-      '<span><strong>' + dates.length + ' snapshot' + (dates.length === 1 ? "" : "s") + '</strong> captured · ' + esc(range) +
-      '. A new snapshot is recorded each day; the charts show how readiness transitions over time.</span></div>' +
+      '<span><strong>' + dates.length + ' day' + (dates.length === 1 ? "" : "s") + ' of records</strong> · ' + esc(range) +
+      '. Every score is recorded once a day, so these charts show how readiness changes over time.</span></div>' +
       avgCard +
       '<div class="trends-grid">' + mixCard + moversCard + '</div>' +
       explorerCard +
-      '<div class="register-footnote">Scores are the published readiness ratings captured at each daily snapshot. ' +
-      'Lines are flat while the underlying curated data is unchanged; transitions appear automatically as ratings ' +
-      'move (e.g. when a live TLS scan or research pass updates a record).</div>' +
+      '<div class="register-footnote">Scores move when the daily website check finds a change or when researchers update a rating. ' +
+      'Flat lines mean nothing has changed in that period, not that nothing is happening.</div>' +
       '</div>';
   };
 })();

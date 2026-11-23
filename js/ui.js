@@ -64,10 +64,10 @@
   }
 
   var TLS_META = {
-    live:    { label: "Hybrid live", c: "var(--success)", icon: "shield-check" },
-    partial: { label: "Capable", c: "var(--info)", icon: "shield-half" },
-    none:    { label: "Classical", c: "var(--danger)", icon: "shield-x" },
-    unknown: { label: "Not assessed", c: "var(--fg-3)", icon: "shield-question" },
+    live:    { label: "Quantum-safe", c: "var(--success)", icon: "shield-check" },
+    partial: { label: "Ready, not on", c: "var(--info)", icon: "shield-half" },
+    none:    { label: "Not yet", c: "var(--danger)", icon: "shield-x" },
+    unknown: { label: "Not checked", c: "var(--fg-3)", icon: "shield-question" },
   };
   function tlsChip(tls) {
     var m = TLS_META[tls] || TLS_META.unknown;
@@ -76,10 +76,10 @@
   }
 
   var PQC_META = {
-    shipping: { label: "Shipping PQC", c: "var(--success)", icon: "package-check" },
-    roadmap:  { label: "Public roadmap", c: "var(--info)", icon: "route" },
+    shipping: { label: "Available now", c: "var(--success)", icon: "package-check" },
+    roadmap:  { label: "Plan published", c: "var(--info)", icon: "route" },
     research: { label: "Research only", c: "var(--warning)", icon: "flask-conical" },
-    none:     { label: "None public", c: "var(--fg-3)", icon: "circle-dashed" },
+    none:     { label: "No public plan", c: "var(--fg-3)", icon: "circle-dashed" },
   };
   function pqcChip(pqc) {
     var m = PQC_META[pqc] || PQC_META.none;
@@ -134,31 +134,30 @@
 
   // Auto-summary for compact institution records.
   function instSummary(b) {
-    if (b.summary) return b.summary;
     var tlsTxt = {
-      live: "Its primary website already negotiates hybrid post-quantum key exchange via its edge provider.",
-      partial: "Its edge infrastructure supports hybrid post-quantum key exchange, though site-wide enablement has not been observed.",
-      none: "Its public endpoints currently negotiate classical key exchange only.",
-      unknown: "Its public TLS posture has not yet been assessed in this snapshot.",
+      live: "Its main website already uses quantum-safe encryption, typically provided through its hosting or cloud provider.",
+      partial: "Its hosting provider supports quantum-safe encryption, but it has not yet been switched on across the website.",
+      none: "Its main website does not yet use quantum-safe encryption.",
+      unknown: "Its website has not yet been checked.",
     }[b.tls];
     var statusTxt = {
-      "Advanced": "Public evidence indicates a mature, active quantum-safe program.",
-      "In progress": "Public signals indicate active planning or early migration work.",
-      "Early stage": "Limited public signals suggest awareness-stage activity, largely via sector bodies and infrastructure choices.",
-      "Not evident": "No public post-quantum activity is evident; readiness will likely follow core and digital-banking vendor timelines.",
+      "Advanced": "Public evidence shows a well-established program to prepare for quantum-safe security.",
+      "In progress": "Public evidence shows active planning or early upgrade work.",
+      "Early stage": "There is limited public evidence — mostly industry-group membership and technology choices rather than a stated plan.",
+      "Not evident": "We found no public evidence of preparation. Its timing will likely depend on its main technology providers.",
     }[b.status];
-    return statusTxt + " " + tlsTxt + (b.note ? " " + b.note : "");
+    return statusTxt + " " + tlsTxt;
   }
 
   // Auto-summary for vendor records.
   function vendorSummary(v) {
     var pqcTxt = {
-      shipping: "Post-quantum cryptography is available in products or services banks consume today.",
-      roadmap: "A public migration plan exists, but PQC is not yet broadly shipping in its financial-sector products.",
-      research: "Public activity is limited to research, pilots, or thought leadership — no product PQC timeline yet.",
-      none: "No public post-quantum activity is evident; client institutions should raise PQC support in vendor due-diligence and renewals.",
+      shipping: "Quantum-safe protection is already available in products or services financial institutions use today.",
+      roadmap: "The provider has published an upgrade plan, but quantum-safe protection is not yet widely available in the products banks use.",
+      research: "Public activity is limited to research or pilots — there is no product timeline yet.",
+      none: "We found no public plan. Clients should ask about quantum-safe support in due diligence and contract renewals.",
     }[v.pqc];
-    return v.note || pqcTxt;
+    return pqcTxt;
   }
 
   function logoMark() {
@@ -191,7 +190,7 @@
   function prototypeBanner() {
     if (bannerDismissed()) return '';
     return '<div class="proto-banner" role="note">' + icon("info", 15) +
-      '<span><b>Prototype for demonstration.</b> Content has not been fully vetted and should not be relied on for decisions.</span>' +
+      '<span><b>Prototype for demonstration.</b> This information has not been fully verified and should not be the basis for decisions.</span>' +
       '<button class="proto-dismiss" data-action="dismiss-banner" aria-label="Dismiss notice">' + icon("x", 15) + '</button></div>';
   }
   function dismissBanner() {
