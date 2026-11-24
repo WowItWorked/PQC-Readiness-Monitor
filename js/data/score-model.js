@@ -45,7 +45,7 @@
     inst: {
       commitment:    { label: "Public commitment",      points: [0, 10, 20, 30, 40] },
       participation: { label: "Industry participation", points: [0, 7, 14, 20] },
-      upgrade:       { label: "Ability to upgrade",     points: [0, 10, 19, 28] },
+      upgrade:       { label: "Ability to upgrade",     points: [0, 0, 19, 28] }, // level 1 = known dependency on a provider with no plan: a risk, not readiness
     },
     vendor: {
       plans:         { label: "Published plans",        points: [0, 8, 16, 25] },
