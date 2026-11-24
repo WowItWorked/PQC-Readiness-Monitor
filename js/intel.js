@@ -211,6 +211,30 @@
       '</div>';
   };
 
+  function rubricTables() {
+    var M = window.PQC_SCORE;
+    function table(title, rows) {
+      return '<div class="rubric-block"><div class="rubric-title">' + title + '</div><table class="rubric-table">' +
+        '<thead><tr><th>Area</th><th>What earns points</th><th class="num">Max</th></tr></thead><tbody>' +
+        rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td class="num">' + r[2] + '</td></tr>'; }).join('') +
+        '</tbody></table></div>';
+    }
+    var ip = M.RUBRIC.inst, vp = M.RUBRIC.vendor;
+    function ladder(points, words) { return words.map(function (w, i) { return w + " (" + points[i] + ")"; }).join(" · "); }
+    return table("Financial institutions", [
+      ["Website encryption", "Main website already uses quantum-safe encryption (12) · supported but not switched on (6) · not yet (0). Checked automatically every day.", 12],
+      [ip.commitment.label, ladder(ip.commitment.points, ["Nothing found", "Acknowledges the risk publicly", "Research, pilots, or a parent-group program", "Named program or undated plan", "Dated plan, or quantum-safe protection in production"]), 40],
+      [ip.participation.label, ladder(ip.participation.points, ["None found", "Member of a relevant industry group", "Active contributor", "Leadership role"]), 20],
+      [ip.upgrade.label, ladder(ip.upgrade.points, ["No information", "Depends on a provider with no public plan", "Core systems on platforms with a quantum-safe plan", "Own encryption inventory or flexibility program"]) +
+        " Website hosting is not counted here; it is already scored under website encryption.", 28],
+    ]) + table("Third-party providers", [
+      ["Quantum-safe products", "Available now in products banks use (" + M.PQC_POINTS.shipping + ") · published plan (" + M.PQC_POINTS.roadmap + ") · research only (" + M.PQC_POINTS.research + ") · none (0)", 45],
+      [vp.plans.label, ladder(vp.plans.points, ["None", "Statements only", "Public plan without dates", "Public plan with dates"]), 25],
+      [vp.participation.label, ladder(vp.participation.points, ["None found", "Member of a relevant group", "Active contributor", "Leadership role"]), 20],
+      [vp.guidance.label, ladder(vp.guidance.points, ["None", "Some customer material", "Detailed migration guidance or tools"]), 10],
+    ]);
+  }
+
   window.renderMethodology = function () {
     function S(title, body) {
       return '<section class="method-section"><h3>' + esc(title) + '</h3><div class="body">' + body + '</div></section>';
@@ -233,17 +257,16 @@
         "<strong>Early stage</strong> (25&ndash;44): limited evidence, mostly industry-group membership and technology choices. " +
         "<strong>Not evident</strong> (under 25): no public evidence found. " +
         "A low rating means we could not find evidence &mdash; not proof that nothing is happening.") +
-      S("What we look at",
-        "For each institution, four areas that can be seen from the outside: (1) whether its main website already uses " +
-        "quantum-safe encryption; (2) whether it has publicly described a plan or program; (3) whether it takes part in " +
-        "industry and government working groups; and (4) how easily its technology choices allow it to upgrade. " +
-        "For providers, we look at whether the products financial institutions buy already offer quantum-safe protection, " +
-        "how clearly the provider has published its plans, its industry participation, and how many institutions depend on it.") +
+      S("How the score is calculated",
+        "Every score is the total of points from a published rubric, based on evidence researchers have verified and " +
+        "linked to its source. Anything that cannot be verified scores zero &mdash; we never estimate upward. " +
+        "Evidence that belongs to a parent group rather than the U.S. organization itself earns partial credit at most. " +
+        rubricTables()) +
       S("How strong is the evidence?",
-        "Every rating carries an evidence level. <strong>Documented</strong>: based on the organization&rsquo;s own public " +
-        "announcements, filings, or research. <strong>Inferred</strong>: worked out from its technology choices and industry " +
-        "participation. <strong>Estimated</strong>: a placeholder until we research it in detail &mdash; most institutions under " +
-        "$100B in assets are currently Estimated. Treat Estimated ratings as a starting point for questions, not a finding.") +
+        "Every rating carries an evidence level. <strong>Documented</strong>: at least one finding is backed by the " +
+        "organization&rsquo;s own announcements, filings, or an official body. <strong>Inferred</strong>: backed only by " +
+        "reputable secondary reporting, or researched with no public evidence found. <strong>Estimated</strong>: a placeholder " +
+        "not yet researched. Each detail panel lists the sources behind the rating.") +
       S("What the ratings do not cover",
         "Anything that cannot be seen from outside the organization: its internal inventory of where encryption is used, " +
         "upgrades to internal systems and payment connections, or the terms of its contracts with providers. A high score " +

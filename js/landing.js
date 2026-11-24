@@ -72,7 +72,7 @@
         v: "overview", l: "Readiness by size" },
       { k: shipping + " vs " + advanced, t: "Providers are ahead of banks",
         b: shipping + " of " + vendors.length + " key providers already offer quantum-safe protection in products banks buy, while " + advanced +
-          " banks are rated Advanced. Asking providers about their plans in due diligence and contract renewals is one of the fastest levers most institutions have.",
+          (advanced === 1 ? " bank is" : " banks are") + " rated Advanced. Asking providers about their plans in due diligence and contract renewals is one of the fastest levers most institutions have.",
         v: "vendors", l: "See all providers" },
     ];
     return '<section class="lp-section"><div class="lp-head">' +

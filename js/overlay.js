@@ -12,5 +12,5 @@
   if (!model) return;
   (window.INSTITUTIONS || []).forEach(function (b) { model.applyScan(b, scan[b.domain], pqcTls.scannedAt); });
   // Vendors have no TLS scan, but their status still follows the score bands.
-  (window.VENDORS || []).forEach(function (v) { v.status = model.band(v.score); });
+  (window.VENDORS || []).forEach(function (v) { model.finalize(v, "vendor"); });
 })();

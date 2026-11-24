@@ -122,7 +122,62 @@
     return { dims: dims, verdict: verdict };
   }
 
+  // Researched records: show the published rubric's real points per area.
+  function rubricBasis(bank) {
+    var isVendor = bank.kind === "vendor";
+    var M = window.PQC_SCORE, kind = isVendor ? "vendor" : "inst";
+    var r = bank.rubric || {};
+    var rows = [];
+    if (isVendor) {
+      rows.push({ label: "Quantum-safe products", got: M.PQC_POINTS[bank.pqc] || 0, max: 45,
+        plain: bank.pqcWhy || (PQC_META[bank.pqc] || PQC_META.none).label, tech: bank.pqcTech || "" });
+    } else {
+      var tlsPlain = { live: "Its main website already uses quantum-safe encryption.",
+        partial: "Its hosting provider supports quantum-safe encryption, but it is not yet switched on across the website.",
+        none: "Its main website does not yet use quantum-safe encryption.",
+        unknown: "Its website has not been checked yet." }[bank.tls] || "";
+      if (bank.tlsObserved) tlsPlain += " Confirmed by our automated check" + (bank.tlsScanned ? " on " + fmtIso(bank.tlsScanned) : "") + ".";
+      rows.push({ label: "Website encryption", got: M.TLS_POINTS[bank.tls] || 0, max: 12, plain: tlsPlain,
+        tech: "Daily TLS 1.3 handshake test offering only the hybrid group X25519MLKEM768 (FIPS 203)." });
+    }
+    Object.keys(M.RUBRIC[kind]).forEach(function (k) {
+      var def = M.RUBRIC[kind][k], c = r[k] || {};
+      rows.push({ label: def.label, got: M.points(kind, k, c.level), max: def.points[def.points.length - 1],
+        plain: c.why || "No public evidence found.", tech: c.tech || "" });
+    });
+    var sorted = rows.slice().sort(function (a, b) { return b.got / b.max - a.got / a.max; });
+    var verdict = bank.name + " is rated " + M.band(bank.score) + " (" + bank.score + " out of 100). Its strongest area is " +
+      sorted[0].label.toLowerCase() + "; the area most in need of progress is " + sorted[sorted.length - 1].label.toLowerCase() +
+      ". Evidence level: " + bank.conf + (bank.researched ? " · researched " + fmtIso(bank.researched + "-01").replace(/ 1,/, "") : "") + ".";
+    var html = rows.map(function (d) {
+      var pct = d.max ? d.got / d.max : 0;
+      var col = pct >= 0.66 ? "var(--success)" : pct >= 0.33 ? "var(--info)" : pct > 0 ? "var(--warning)" : "var(--fg-3)";
+      return '<div class="rb-row"><div class="rb-row-head">' +
+        '<span class="rb-label">' + esc(d.label) + '</span>' +
+        '<span class="rb-meter" aria-hidden="true"><span style="width:' + Math.round(pct * 100) + '%;background:' + col + '"></span></span>' +
+        '<span class="rb-points" style="color:' + col + '">' + d.got + ' / ' + d.max + '</span></div>' +
+        '<div class="rb-plain">' + esc(d.plain) + '</div>' +
+        (d.tech ? '<details class="rb-tech-wrap"><summary>Technical detail</summary><div class="rb-tech">' + esc(d.tech) + '</div></details>' : '') +
+        '</div>';
+    }).join('');
+    return '<div class="drawer-h">Why this rating</div>' +
+      '<div class="rb-note">The score adds up points from the areas below, using the published rubric on the How We Rate page. ' +
+      'Each area is explained in plain terms, with technical detail available for specialists.</div>' +
+      '<div class="rb-verdict">' + esc(verdict) + '</div>' +
+      '<div class="rb-list">' + html + '</div>';
+  }
+
+  function sourcesHtml(bank) {
+    var src = (bank.sources || []).filter(function (x) { return x && /^https?:\/\//i.test(x.url || ""); });
+    if (!src.length) return '';
+    return '<div class="drawer-h">Sources</div><ul class="drawer-sources">' + src.map(function (x) {
+      return '<li><a href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(x.t || x.url) + '</a>' +
+        '<span class="dim">' + (x.d ? ' · ' + esc(x.d) : '') + (x.primary ? ' · primary source' : '') + '</span></li>';
+    }).join('') + '</ul>';
+  }
+
   function buildRatingBasis(bank) {
+    if (bank.rubric) return rubricBasis(bank) + sourcesHtml(bank);
     var rb = ratingBasis(bank);
     var COL = ["var(--fg-3)", "var(--warning)", "var(--info)", "var(--success)"];
     var WORD = ["Not assessed", "Limited", "Moderate", "Strong"];

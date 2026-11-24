@@ -172,15 +172,22 @@
   // How current each input is. The TLS scan runs daily; curated ratings and the
   // standards/guidance baseline change only on a research pass — never conflate them.
   var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   function fmtIso(d) {
     var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || "");
     return m ? MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1] : "";
   }
   function pqcFreshness() {
     var n = window.PQC_NEWS || {};
+    // Ratings date = the most recent research pass recorded on the data itself.
+    var latest = "";
+    (window.INSTITUTIONS || []).concat(window.VENDORS || []).forEach(function (e) {
+      if (e.researched && e.researched > latest) latest = e.researched;
+    });
+    var researched = latest ? MONTH_NAMES[+latest.slice(5, 7) - 1] + " " + latest.slice(0, 4) : "";
     return {
       tls: fmtIso((window.PQC_TLS || {}).scannedAt) || n.asOf || "—",
-      ratings: n.ratingsReviewed || "—",
+      ratings: researched || n.ratingsReviewed || "—",
       intel: n.intelReviewed || "—",
     };
   }

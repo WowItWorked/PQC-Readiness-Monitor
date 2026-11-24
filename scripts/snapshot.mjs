@@ -25,7 +25,10 @@ try {
   const model = loadWindow("js/data/score-model.js").PQC_SCORE;
   const tls = fs.existsSync("js/data/tls-scan.js") ? (loadWindow("js/data/tls-scan.js").PQC_TLS || {}) : {};
   const scan = tls.results || {};
-  if (model) inst.forEach((b) => model.applyScan(b, scan[b.domain]));
+  if (model) {
+    inst.forEach((b) => model.applyScan(b, scan[b.domain]));
+    vend.forEach((v) => model.finalize(v, "vendor")); // researched vendors: score from rubric
+  }
 } catch (e) { /* no scan yet — record baseline scores */ }
 
 const histPath = "js/data/history.js";
