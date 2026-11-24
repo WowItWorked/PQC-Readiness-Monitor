@@ -190,6 +190,7 @@
     var observed = liveList.filter(function (b) { return b.tlsObserved; }).length;
     var scanned = data.filter(function (b) { return b.tlsObserved; }).length;
     var estimated = data.filter(function (b) { return b.conf === "Estimated"; }).length;
+    var documentedAll = data.filter(function (b) { return b.conf === "Documented"; }).length;
     var tlsEvidence = '<span class="ev-text">' + (observed === liveList.length
       ? (liveList.length ? "All " + observed : "None") + " confirmed by our daily automated website check"
       : observed + " confirmed by our daily check · " + (liveList.length - observed) + " assumed") +
@@ -219,7 +220,11 @@
       (estimated ? '<p class="hero-caveat">' + icon("info", 15) + '<span><strong>' + estimated + ' of ' + data.length +
         ' institution ratings are still placeholder estimates</strong> until we research them in detail, so treat ' +
         'these counts as a guide, not a verdict. The website checks and publicly documented ratings are the most reliable figures. ' +
-        '<a href="#methodology" data-view="methodology">How ratings are evidenced</a></span></p>' : '') +
+        '<a href="#methodology" data-view="methodology">How ratings are evidenced</a></span></p>'
+      : '<p class="hero-caveat">' + icon("info", 15) + '<span><strong>Every rating is researched and sourced.</strong> ' +
+        documentedAll + ' of ' + data.length + ' institution ratings rest on the organizations&rsquo; own disclosures or official ' +
+        'records; the rest rely on reputable reporting, or on finding no public evidence &mdash; which is not proof of inaction. ' +
+        '<a href="#methodology" data-view="methodology">How ratings are evidenced</a></span></p>') +
       '</div></section>';
   }
 

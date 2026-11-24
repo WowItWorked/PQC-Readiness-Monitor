@@ -590,3 +590,22 @@ p.drawer-summary { font-size: 14px; line-height: 22px; color: var(--fg-2); margi
 .method-section code { font-family: var(--font-mono); font-size: 12.5px; background: var(--bg-2); padding: 1px 5px; border-radius: 3px; }
 @media (max-width: 560px) { .gloss-row { grid-template-columns: 1fr; gap: 2px; } }
 p.drawer-research, .drawer-research { font-size: 13px; line-height: 1.6; color: var(--fg-2); margin: 0; }
+
+/* Rubric points in the detail panel */
+.rb-meter { width: 64px; height: 6px; border-radius: 3px; background: var(--gray-100); overflow: hidden; flex: none; display: inline-block; }
+.rb-meter span { display: block; height: 100%; border-radius: 3px; }
+.rb-points { font-family: var(--font-mono); font-size: 12px; font-weight: 600; min-width: 52px; text-align: right; flex: none; }
+.drawer-sources { margin: 0; padding: 0 0 0 18px; display: grid; gap: 6px; }
+.drawer-sources li { font-size: 13px; line-height: 1.45; }
+.drawer-sources a { color: var(--fg-link); }
+.drawer-sources .dim { color: var(--fg-3); font-size: 12px; }
+
+/* How We Rate — rubric tables */
+.rubric-block { margin-top: 14px; }
+.rubric-title { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 6px; }
+.rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5; }
+.rubric-table th { text-align: left; font-size: 11.5px; color: var(--fg-3); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--line-2); }
+.rubric-table td { padding: 8px; border-bottom: 1px solid var(--line-1); vertical-align: top; color: var(--fg-2); }
+.rubric-table td:first-child { font-weight: 700; color: var(--fg-1); white-space: nowrap; }
+.rubric-table .num { text-align: right; font-family: var(--font-mono); }
+@media (max-width: 560px) { .rubric-table td:first-child { white-space: normal; } }
