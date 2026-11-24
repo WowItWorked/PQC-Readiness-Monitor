@@ -55,6 +55,35 @@
   }
 
   /* ---- Migration deadline timeline --------------------------------------- */
+  // Phone layout: the same events as a vertical list (no sideways scrolling),
+  // with today's position and the projected code-breaking window marked inline.
+  function verticalTimeline(marks, now, crqcStart) {
+    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var d = new Date();
+    var rows = [], todayDone = false, windowDone = false;
+    function item(cls, when, label, sub) {
+      return '<li class="tlv-item ' + cls + '"><span class="tlv-when">' + when + '</span>' +
+        '<span class="tlv-dot" aria-hidden="true"></span>' +
+        '<span class="tlv-body"><span class="tlv-label">' + label + '</span>' +
+        (sub ? '<span class="tlv-sub">' + sub + '</span>' : '') + '</span></li>';
+    }
+    marks.slice().sort(function (a, b) { return a.y - b.y; }).forEach(function (m) {
+      if (!todayDone && m.y > now) {
+        rows.push(item("is-today", MONTHS[d.getMonth()] + " " + d.getFullYear(), "Today", ""));
+        todayDone = true;
+      }
+      if (!windowDone && m.y >= crqcStart) {
+        rows.push('<li class="tlv-window" role="note">From 2030: when a code-breaking quantum computer may arrive (most estimates)</li>');
+        windowDone = true;
+      }
+      // The date is already in the left column; drop it from the source line.
+      var sub = m.sub.replace(" · " + m.when, "");
+      rows.push(item(m.y >= crqcStart ? "in-window" : (m.y <= now ? "is-past" : ""), m.when, m.label, sub));
+    });
+    if (!todayDone) rows.push(item("is-today", MONTHS[d.getMonth()] + " " + d.getFullYear(), "Today", ""));
+    return '<ol class="tl-vertical" aria-label="Key deadlines, in date order">' + rows.join('') + '</ol>';
+  }
+
   function timeline() {
     var start = 2024, end = 2036.5;
     var pos = function (y) { return ((y - start) / (end - start)) * 100 + "%"; };
@@ -63,13 +92,13 @@
     var now = d.getFullYear() + (d.getMonth() + d.getDate() / 31) / 12;
     var crqcStart = 2030;
     var marks = [
-      { y: 2024.62, lane: "t2", anchor: "start", label: "First quantum-safe standards", sub: "NIST · Aug 2024" },
-      { y: 2025.4,  lane: "b2", label: "Research: encryption easier to break", sub: "Google · May 2025" },
-      { y: 2026.04, lane: "t1", label: "G7 financial-sector roadmap", sub: "UK Treasury · Jan 2026" },
-      { y: 2029,    lane: "b1", label: "Google &amp; Cloudflare targets", sub: "Own 2029 upgrade deadlines" },
-      { y: 2030,    lane: "t2", label: "Retirement of today\u2019s encryption begins", sub: "NIST · EU critical infra" },
-      { y: 2032,    lane: "b2", label: "Critical financial systems upgraded", sub: "G7 target" },
-      { y: 2035,    lane: "t1", label: "Today\u2019s encryption no longer allowed", sub: "NIST · U.S. federal target" },
+      { y: 2024.62, when: "Aug 2024", lane: "t2", anchor: "start", label: "First quantum-safe standards", sub: "NIST · Aug 2024" },
+      { y: 2025.4,  when: "May 2025", lane: "b2", label: "Research: encryption easier to break", sub: "Google · May 2025" },
+      { y: 2026.04, when: "Jan 2026", lane: "t1", label: "G7 financial-sector roadmap", sub: "UK Treasury · Jan 2026" },
+      { y: 2029,    when: "2029", lane: "b1", label: "Google &amp; Cloudflare targets", sub: "Own 2029 upgrade deadlines" },
+      { y: 2030,    when: "After 2030", lane: "t2", label: "Retirement of today\u2019s encryption begins", sub: "NIST · EU critical infra" },
+      { y: 2032,    when: "2030–2032", lane: "b2", label: "Critical financial systems upgraded", sub: "G7 target" },
+      { y: 2035,    when: "2035", lane: "t1", label: "Today\u2019s encryption no longer allowed", sub: "NIST · U.S. federal target" },
     ];
     // Four label lanes around the axis so neighbours never collide:
     // t2 (high) · t1 (near, 2-line budget) · AXIS · b1 (near) · b2 (low)
@@ -125,6 +154,7 @@
         return '<span>' + y + '</span>';
       }).join('') + '</div>' +
       '</div></div>' +
+      verticalTimeline(marks, now, crqcStart) +
       '<div class="tl-footnote">Why the urgency: in 2025, Google researchers estimated that the encryption most ' +
       'organizations rely on could be broken with far less quantum computing power than previously thought. Expert ' +
       'surveys in 2025 put the chance of such a machine within ten years at roughly 28&ndash;49%. Information stolen ' +

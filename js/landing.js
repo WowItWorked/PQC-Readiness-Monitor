@@ -27,7 +27,8 @@
       '<nav class="lp-links" aria-label="Sections">' + LINKS.map(function (l) {
         return '<a href="#' + l[0] + '" data-view="' + l[0] + '">' + esc(l[1]) + '</a>';
       }).join('') + '</nav>' +
-      '<a class="lp-cta" href="#overview" data-view="overview">Open dashboard ' + icon("arrow-right", 15) + '</a>' +
+      '<a class="lp-cta" href="#overview" data-view="overview"><span class="lp-cta-full">Open dashboard</span>' +
+        '<span class="lp-cta-short">Dashboard</span> ' + icon("arrow-right", 15) + '</a>' +
       '</div></header>';
   }
 
