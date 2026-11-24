@@ -260,6 +260,7 @@
       S("How the score is calculated",
         "Every score is the total of points from a published rubric, based on evidence researchers have verified and " +
         "linked to its source. Anything that cannot be verified scores zero &mdash; we never estimate upward. " +
+        "Evidence that belongs to a parent group rather than the U.S. organization itself earns partial credit at most. " +
         rubricTables()) +
       S("How strong is the evidence?",
         "Every rating carries an evidence level. <strong>Documented</strong>: at least one finding is backed by the " +

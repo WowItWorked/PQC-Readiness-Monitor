@@ -148,7 +148,7 @@
     var sorted = rows.slice().sort(function (a, b) { return b.got / b.max - a.got / a.max; });
     var verdict = bank.name + " is rated " + M.band(bank.score) + " (" + bank.score + " out of 100). Its strongest area is " +
       sorted[0].label.toLowerCase() + "; the area most in need of progress is " + sorted[sorted.length - 1].label.toLowerCase() +
-      ". Evidence level: " + bank.conf + (bank.researched ? " · researched " + bank.researched : "") + ".";
+      ". Evidence level: " + bank.conf + (bank.researched ? " · researched " + fmtIso(bank.researched + "-01").replace(/ 1,/, "") : "") + ".";
     var html = rows.map(function (d) {
       var pct = d.max ? d.got / d.max : 0;
       var col = pct >= 0.66 ? "var(--success)" : pct >= 0.33 ? "var(--info)" : pct > 0 ? "var(--warning)" : "var(--fg-3)";
