@@ -7,7 +7,7 @@
    The live feeds in feeds.js extend each section on every page load. */
 
 window.PQC_NEWS = {
-  asOf: "November 23, 2026",
+  asOf: "November 24, 2026",
   // Last curated research pass (update when ratings / intelligence are reviewed).
   ratingsReviewed: "June 2026",
   intelReviewed: "June 2026",
