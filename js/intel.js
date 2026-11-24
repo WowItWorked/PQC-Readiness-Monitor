@@ -225,7 +225,8 @@
       ["Website encryption", "Main website already uses quantum-safe encryption (12) · supported but not switched on (6) · not yet (0). Checked automatically every day.", 12],
       [ip.commitment.label, ladder(ip.commitment.points, ["Nothing found", "Acknowledges the risk publicly", "Research, pilots, or a parent-group program", "Named program or undated plan", "Dated plan, or quantum-safe protection in production"]), 40],
       [ip.participation.label, ladder(ip.participation.points, ["None found", "Member of a relevant industry group", "Active contributor", "Leadership role"]), 20],
-      [ip.upgrade.label, ladder(ip.upgrade.points, ["No information", "Depends on a provider with no public plan", "Uses providers with quantum-safe support", "Own encryption inventory or flexibility program"]), 28],
+      [ip.upgrade.label, ladder(ip.upgrade.points, ["No information", "Depends on a provider with no public plan", "Core systems on platforms with a quantum-safe plan", "Own encryption inventory or flexibility program"]) +
+        " Website hosting is not counted here; it is already scored under website encryption.", 28],
     ]) + table("Third-party providers", [
       ["Quantum-safe products", "Available now in products banks use (" + M.PQC_POINTS.shipping + ") · published plan (" + M.PQC_POINTS.roadmap + ") · research only (" + M.PQC_POINTS.research + ") · none (0)", 45],
       [vp.plans.label, ladder(vp.plans.points, ["None", "Statements only", "Public plan without dates", "Public plan with dates"]), 25],
